@@ -1,0 +1,36 @@
+Package: Spec2Xtract
+Title: Extract MS2 spectra from LC-MS
+Version: 0.1
+Authors@R: 
+    c(
+      person(given = "Sylvain", family = "Dechaumet", email = "sylvain.dechaumet@cea.fr", role = c("aut", "cre")),
+      person(given = "Etienne", family = "Thevenot", email = "etienne.thevenot@cea.fr", role = c("ctb")),
+      person(given = "Eric", family = "Venot", email = "eric.venot@cea.fr", role = c("rev")),
+      person(given = "Annelaure", family = "Damont", email = "annelaure.damont@cea.fr", role = c("ctb")),
+      person(given = "Chenqin", family = "Cao", email = "chenqin.cao@cea.fr", role = c("dtc")),
+      person(given = "Anaïs", family = "Legrand", email = "anais.legrand@cea.fr", role = c("ctb"))
+    )
+Description: Extract MS2 spectra from .raw Thermo files acquired in LC-MS/MS using the rawrr package,
+    control chromatogram and spectral quality and return the MS2 spectra in different format
+    (table, msp, mzml).
+License: file LICENSE
+Depends:
+    R (>= 4.0.0)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Imports: 
+    Biobase,
+    data.table,
+    future,
+    future.apply,
+    ggplot2,
+    ggpubr,
+    magrittr,
+    mzR,
+    rawrr,
+    stringr
+Suggests: 
+    testthat (>= 3.0.0),
+    covr
+Config/testthat/edition: 3
