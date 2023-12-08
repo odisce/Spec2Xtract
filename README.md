@@ -4,7 +4,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of **Spec2Xtract** is an [R](https://www.r-project.org/) package to extract MS2 spectra from 
+**Spec2Xtract** is an [R](https://www.r-project.org/) package to extract MS2 spectra from 
 [.mzML](https://en.wikipedia.org/wiki/Mass_spectrometry_data_format#mzML) files or directly from .raw files 
 acquired on [Thermo](https://www.thermofisher.com) instrument by using [mzR](https://github.com/sneumann/mzR/) 
 or [rawrr](https://github.com/fgcz/rawrr) respectively. The package is compatible with multi-energy acquisition, 
@@ -23,10 +23,7 @@ devtools::install_github("odisce/Spec2Xtract")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+### Extract MS2 spectra from a .raw file
 
-``` r
-library(Spec2Xtract)
-## basic example code
-```
+In progress
 

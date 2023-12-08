@@ -1,6 +1,6 @@
 Package: Spec2Xtract
 Title: Extract MS2 spectra from LC-MS
-Version: 0.1
+Version: 0.2
 Authors@R: 
     c(
       person(given = "Sylvain", family = "Dechaumet", email = "sylvain.dechaumet@cea.fr", role = c("aut", "cre")),
@@ -29,8 +29,10 @@ Imports:
     magrittr,
     mzR,
     rawrr,
+    Spec2Annot,
     stringr
 Suggests: 
     testthat (>= 3.0.0),
     covr
+Remotes: odisce/Spec2Annot
 Config/testthat/edition: 3
