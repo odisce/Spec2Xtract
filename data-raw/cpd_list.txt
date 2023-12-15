@@ -1,0 +1,5 @@
+compound	elemcomposition	rtsec	inchikey
+UnknownA	C24H39N1O1S1_13C2	15	
+UnknownB	C22H14N2O4_13C1	22	
+UnknownC	C25H41O1_13C4	20	
+UnknownD	C20H43N2O1S2_13C2	40	

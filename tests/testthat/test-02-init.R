@@ -14,15 +14,41 @@ test_that("Spec2Xtract::parse_index_dt", {
   expect_true(temp_index_parsed[msLevel == 2, unique(spec_coltype)] == "hcd")
 })
 
-# test_that("Spec2Xtract::fun_check_cpd", {
-#   expect_true(TRUE)
-#   Spec2Xtract::fun_check_cpd()
-# })
+test_that("Spec2Xtract::fun_check_cpd", {
+  temp_cpd <- Spec2Xtract::fun_check_cpd(Spec2Xtract:::example_cpdlist)
+  expect_true(is.data.table(temp_cpd))
+  expect_true(all(c("compound", "elemcomposition", "rtsec", "inchikey", "cpd_iter", "rtmin") %in% names(temp_cpd)))
+  expect_true(temp_cpd[, all(is.na(inchikey))])
+  expect_true(temp_cpd[, all(is.numeric(rtsec))])
+  expect_true(temp_cpd[, all(is.numeric(rtmin))])
+  expect_true(temp_cpd[, all(is.character(compound))])
+  expect_true(temp_cpd[, all(is.character(elemcomposition))])
+  expect_true(temp_cpd[, all(is.integer(cpd_iter))])
+})
 
-# test_that('Spec2Xtract::cpd_add_ionsmass', {
-#   expect_true(TRUE)
-# })
+test_that('Spec2Xtract::cpd_add_ionsmass', {
+  temp_cpd <- Spec2Xtract::fun_check_cpd(Spec2Xtract:::example_cpdlist)
+  temp_cpd_supp <- Spec2Xtract::cpd_add_ionsmass(temp_cpd)
+  expect_true(is.data.table(temp_cpd_supp))
+  expect_true(all(dim(temp_cpd_supp) == dim(temp_cpd) + c(0,3)))
+  expect_true(all(c("mz_neutral", "mz_pos", "mz_neg") %in% names(temp_cpd_supp)))
+  expect_true(all(temp_cpd_supp[, lapply(.SD, is.numeric), .SDcols = c("mz_neutral", "mz_pos", "mz_neg")]))
+  expect_true(all(temp_cpd_supp[, mz_pos > mz_neutral & mz_neg < mz_neutral]))
+})
 
-# test_that('Spec2Xtract::init_object', {
-#   expect_true(TRUE)
-# })
+test_that('Spec2Xtract::init_object', {
+  temp_init <- Spec2Xtract::init_object(files = rawrr::sampleFilePath(), cpd = Spec2Xtract:::example_cpdlist)
+  expect_true(is.list(temp_init))
+  expect_true(all(c("file", "cpd") %in% names(temp_init)))
+  expect_true(is.list(temp_init$file))
+  expect_true(all(c("info", "index") %in% names(temp_init$file)))
+  expect_true(nrow(temp_init$file$info) == 1)
+  expect_true(length(temp_init$file$index) == 1)
+  expect_true(length(temp_init$cpd) == nrow(Spec2Xtract:::example_cpdlist))
+  expect_true("cpd_info" %in% names(temp_init$cpd[[1]]))
+  expect_true(is.data.table(temp_init$cpd[[1]]$cpd_info))
+  expect_true(temp_init$cpd[[1]]$cpd_info$cpd_iter == 1)
+  expect_true(temp_init$cpd[[3]]$cpd_info$cpd_iter == 3)
+  expect_true("cpdCheck" %in% names(temp_init$cpd[[3]]$cpd_info))
+  expect_true(temp_init$cpd[[3]]$cpd_info$cpdCheck == TRUE)
+})

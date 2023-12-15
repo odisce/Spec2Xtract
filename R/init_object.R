@@ -96,6 +96,8 @@ parse_index_dt <- function(index_table) {
 #' 
 #' @import data.table magrittr
 #' @return Return a formated data.table with compound informations
+#' @example 
+#' fun_check_cpd(Spec2Xtract:::example_cpdlist)
 #' @export
 #'
 fun_check_cpd <- function(cpd) {
