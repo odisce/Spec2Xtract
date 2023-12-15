@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [main, master]
 
-name: test-coverage
+name: check-R
 
 jobs:
   test-coverage:
@@ -38,7 +38,9 @@ jobs:
         shell: Rscript {0}
       
       - name: Check
-        run: rcmdcheck::rcmdcheck(build_args = "", args = "", error_on = "error", check_dir = "/tmp/rpackage.Rcheck")
+        run: |
+          system("R CMD BATCH inst/installrawrr.R)
+          rcmdcheck::rcmdcheck(build_args = "", args = "", error_on = "error", check_dir = "/tmp/rpackage.Rcheck")
         shell: Rscript {0}
       
       - uses: actions/upload-artifact@v2

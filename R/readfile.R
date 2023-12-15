@@ -23,7 +23,7 @@ check_rawfile <- function(rawpath) {
     "raw" = {
       message("analyzing using .raw file implementation.")
       temp <- tryCatch(
-        rawrr:::readTrailer(rawpath),
+        rawrr::readTrailer(rawpath),
         error = function(e) {
           print(e)
           stop("Cannot open the .raw file with rawrr. The raw file must be from a Thermo MS spectrometer")

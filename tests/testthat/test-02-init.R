@@ -15,5 +15,14 @@ test_that("Spec2Xtract::parse_index_dt", {
 })
 
 # test_that("Spec2Xtract::fun_check_cpd", {
-#   fun_check_cpd
+#   expect_true(TRUE)
+#   Spec2Xtract::fun_check_cpd()
+# })
+
+# test_that('Spec2Xtract::cpd_add_ionsmass', {
+#   expect_true(TRUE)
+# })
+
+# test_that('Spec2Xtract::init_object', {
+#   expect_true(TRUE)
 # })
