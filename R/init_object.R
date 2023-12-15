@@ -96,8 +96,9 @@ parse_index_dt <- function(index_table) {
 #' 
 #' @import data.table magrittr
 #' @return Return a formated data.table with compound informations
-#' @example 
+#' @examples
 #' fun_check_cpd(Spec2Xtract:::example_cpdlist)
+#' 
 #' @export
 #'
 fun_check_cpd <- function(cpd) {
@@ -122,8 +123,7 @@ fun_check_cpd <- function(cpd) {
 #'
 #' @inheritParams fun_check_cpd
 #' 
-#' @import magrittr data.table
-#' @importFrom Spec2Annot mz_from_string mz_calc_ion Element
+#' @import magrittr data.table Spec2Annot
 #'
 #' @return Return the \code{cpd} table with mz_neutral, mz_pos and mz_neg values calculated 
 #'         from the elemental composition

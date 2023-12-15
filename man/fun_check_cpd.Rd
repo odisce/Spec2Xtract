@@ -16,3 +16,7 @@ Return a formated data.table with compound informations
 \description{
 Check compound file
 }
+\examples{
+fun_check_cpd(Spec2Xtract:::example_cpdlist)
+
+}
