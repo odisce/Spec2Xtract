@@ -8,7 +8,7 @@
 #' 
 #' @importFrom rawrr readTrailer
 #' @importFrom tools file_ext
-#' @importFrom mzR openMSfile
+#' @importFrom MSnbase readMSData
 #' @importFrom stringr str_to_lower
 #' @export
 #'
@@ -33,10 +33,10 @@ check_rawfile <- function(rawpath) {
     "mzml" = {
       message("analyzing using .mzML file implementation.")
       temp <- tryCatch(
-        mzR::openMSfile(files = rawpath, mode = "onDisk"),
+        MSnbase::readMSData(files = rawpath, mode = "onDisk"),
         error = function (e) {
           print(e)
-          stop("Cannot open the .mzML file with mzR. Check compatibility or try a different format")
+          stop("Cannot open the .mzML file with MSnbase. Check compatibility or try a different format")
         }
       )
       return(rawpath)
@@ -44,14 +44,13 @@ check_rawfile <- function(rawpath) {
     "mzxml" = {
       message("analyzing using .mzXML file implementation.")
       temp <- tryCatch(
-        mzR::openMSfile(files = rawpath, mode = "onDisk"),
+        MSnbase::readMSData(files = rawpath, mode = "onDisk"),
         error = function (e) {
           print(e)
-          stop("Cannot open the .mzXML file with mzR. Check compatibility or try a different format")
+          stop("Cannot open the .mzXML file with MSnbase. Check compatibility or try a different format")
         }
       )
       return(rawpath)
     }
   )
 }
-

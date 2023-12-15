@@ -26,13 +26,16 @@ Imports:
     future.apply,
     ggplot2,
     ggpubr,
+    lifecycle,
     magrittr,
+    MSnbase,
     mzR,
     rawrr,
     Spec2Annot,
     stringr
 Suggests: 
     testthat (>= 3.0.0),
-    covr
+    covr,
+    msdata
 Remotes: odisce/Spec2Annot
 Config/testthat/edition: 3
