@@ -39,7 +39,7 @@ jobs:
       
       - name: Check
         run: |
-          system("R CMD BATCH inst/installrawrr.R)
+          system("R CMD BATCH inst/installrawrr.R")
           rcmdcheck::rcmdcheck(build_args = "", args = "", error_on = "error", check_dir = "/tmp/rpackage.Rcheck")
         shell: Rscript {0}
       
