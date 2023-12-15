@@ -1,15 +1,19 @@
-test_that("Spec2Xtract::get_rawindex: ", {
+test_that("Spec2Xtract::get_rawindex", {
   temp_index <- Spec2Xtract::get_rawindex(rawrr::sampleFilePath())
   expect_true(data.table::is.data.table(temp_index))
-  testthat::expect_true(
-     == rawrr::sampleFilePath()
-  )
+  expect_true(all(dim(temp_index) == c(574,9)))
 })
 
-test_that("Spec2Xtract::check_rawfile: .mzML", {
-  f <- system.file("sciex/20171016_POOL_POS_1_105-134.mzML", package = "msdata")
-  testthat::expect_true(
-    Spec2Xtract::check_rawfile(f) == f
-  )
+test_that("Spec2Xtract::parse_index_dt", {
+  temp_index_parsed <- Spec2Xtract::parse_index_dt(index_table = Spec2Xtract::get_rawindex(rawrr::sampleFilePath()))
+  expect_true(is.data.table(temp_index_parsed))
+  expect_true(all(dim(temp_index_parsed) == c(574, 14)))
+  expect_true(all(c("spec_energy", "spec_coltype", "spec_polarity", "spec_prec", "msLevel") %in% names(temp_index_parsed)))
+  expect_true(temp_index_parsed[msLevel == 2 & is.na(spec_prec), .N] == 0)
+  expect_true(temp_index_parsed[msLevel == 1 & is.na(spec_prec), .N] == temp_index_parsed[msLevel == 1, .N])
+  expect_true(temp_index_parsed[msLevel == 2, unique(spec_coltype)] == "hcd")
 })
 
+# test_that("Spec2Xtract::fun_check_cpd", {
+#   fun_check_cpd
+# })

@@ -36,28 +36,53 @@ get_rawindex <- function(rawpath) {
 #' @export
 #'
 parse_index_dt <- function(index_table) {
+
+  pattern_search <- list(
+    "spec_prec" = list(
+      "pattern" = "^.*ms[0-9]{1,2} ([0-9]{1,5}\\.[0-9]{1,6})\\@.*$",
+      "subset" = "\\1"
+    ),
+    "char_to_parse" = list(
+      "pattern" = "^.*\\@([a-zA-Z]{1,6}[0-9]{1,4}\\.[0-9]{0,4}).\\[.*$",
+      "subset" = "\\1"
+    ),
+    "spec_energy" = list(
+      "pattern" = "^.*\\@([a-zA-Z]{1,6})([0-9]{1,6}\\.[0-9]{0,6}).\\[.*$",
+      "subset" = "\\2"
+    ),
+    "spec_coltype" = list(
+      "pattern" = "^.*\\@([a-zA-Z]{1,6})([0-9]{1,6}\\.[0-9]{0,6}).\\[.*$",
+      "subset" = "\\1"
+    )
+  )
+
   output <- index_table[, {
     msLevel <- gsub("^.*(ms)([0-9]{0,2}) .*$", "\\2", scanType)
-    polarity <- gsub("^.*(\\+|\\-).*ms.*$", "\\1", scanType)
-    spec_polarity <- ifelse(polarity == "+", 1, 0)
     if (msLevel == "") {
-      spec_energy <- "NA"
-      spec_coltype <- "NA"
-      spec_prec <- "NA"
-      msLevel <- 1
+      pattern_res <- list(
+        "spec_energy" = FALSE,
+        "spec_coltype" = FALSE,
+        "spec_prec" = FALSE
+      )
+      pattern_res$mslevel <- 1
     } else {
-      spec_prec <- gsub("^.*ms[0-9]{1,2} ([0-9]{1,5}\\.[0-9]{1,6})\\@.*$", "\\1", x = scanType)
-      char_to_parse <- gsub("^.*\\@([A-z]{1,6}[0-9]{1,4}\\.[0-9]{0,4}).\\[.*$", "\\1", x = scanType)
-      spec_energy <- gsub("([A-z]{1,6})([0-9]{1,6}\\.[0-9]{0,6})", "\\2", char_to_parse)
-      spec_coltype <- gsub("([A-z]{1,6})([0-9]{1,6}\\.[0-9]{0,6})", "\\1", char_to_parse)
-      msLevel <- as.numeric(msLevel)
+      pattern_res <- lapply(pattern_search, function(x) {
+        if (grepl(pattern = x$pattern, x = scanType)) {
+          gsub(pattern = x$pattern, replacement = x$subset, x = scanType)
+        } else {
+          return(FALSE)
+        }
+      })
+      pattern_res$mslevel <- msLevel
+      polarity <- gsub("^.*(\\+|\\-).*ms.*$", "\\1", scanType)
+      pattern_res$spec_polarity <- ifelse(polarity == "+", 1, 0)
     }
     .(
-      msLevel = as.integer(msLevel),
-      spec_energy = as.numeric(spec_energy),
-      spec_coltype = as.character(spec_coltype),
-      spec_polarity = as.integer(spec_polarity),
-      spec_prec = as.numeric(spec_prec)
+      msLevel = as.integer(pattern_res$mslevel),
+      spec_energy = pattern_res$spec_energy %>% {ifelse(isFALSE(.), as.numeric(NA), as.numeric(.))},
+      spec_coltype = pattern_res$spec_coltype %>% {ifelse(isFALSE(.), as.character(NA), as.character(.))},
+      spec_polarity = pattern_res$spec_polarity %>% {ifelse(isFALSE(.), as.integer(NA), as.integer(.))},
+      spec_prec = pattern_res$spec_prec %>% {ifelse(isFALSE(.), as.numeric(NA), as.numeric(.))}
     )
   }, by = .(scan)]
   merge(index_table, output, by = "scan") %>%
