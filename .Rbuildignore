@@ -3,3 +3,4 @@
 .devcontainer
 .github
 ^\.github$
+^codecov\.yml$

@@ -4,6 +4,7 @@
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![Codecov test coverage](https://codecov.io/gh/odisce/Spec2Xtract/branch/main/graph/badge.svg)](https://app.codecov.io/gh/odisce/Spec2Xtract?branch=main)
+[![R-CMD-check](https://github.com/odisce/Spec2Xtract/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/odisce/Spec2Xtract/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 **Spec2Xtract** is an [R](https://www.r-project.org/) package to extract MS2 spectra from 
