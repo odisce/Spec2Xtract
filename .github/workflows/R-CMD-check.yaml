@@ -44,6 +44,9 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
+      - name: Install rawrr Dep
+        run: system("R CMD BATCH inst/installrawrr.R")
+
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true

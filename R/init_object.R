@@ -123,7 +123,7 @@ fun_check_cpd <- function(cpd) {
 #' @inheritParams fun_check_cpd
 #' 
 #' @import magrittr data.table
-#' @importFrom Spec2Annot mz_from_string mz_calc_ion
+#' @importFrom Spec2Annot mz_from_string mz_calc_ion Element
 #'
 #' @return Return the \code{cpd} table with mz_neutral, mz_pos and mz_neg values calculated 
 #'         from the elemental composition
