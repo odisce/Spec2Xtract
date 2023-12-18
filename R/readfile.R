@@ -28,6 +28,9 @@ check_rawfile <- function(rawpath) {
           print(e)
           stop("Cannot open the .raw file with rawrr. The raw file must be from a Thermo MS spectrometer")
         })
+        if (is.character(temp) && length(temp) == 1 && grepl("Unable to", temp)) {
+          stop("Cannot open the .raw file with rawrr. The raw file must be from a Thermo MS spectrometer")
+        }
       return(rawpath)
     },
     "mzml" = {

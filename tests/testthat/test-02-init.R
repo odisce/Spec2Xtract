@@ -5,13 +5,16 @@ test_that("Spec2Xtract::get_rawindex", {
 })
 
 test_that("Spec2Xtract::parse_index_dt", {
-  temp_index_parsed <- Spec2Xtract::parse_index_dt(index_table = Spec2Xtract::get_rawindex(rawrr::sampleFilePath()))
+  temp_index_table <- Spec2Xtract::get_rawindex(rawrr::sampleFilePath())
+  temp_index_parsed <- Spec2Xtract::parse_index_dt(index_table = temp_index_table)
   expect_true(is.data.table(temp_index_parsed))
   expect_true(all(dim(temp_index_parsed) == c(574, 14)))
   expect_true(all(c("spec_energy", "spec_coltype", "spec_polarity", "spec_prec", "msLevel") %in% names(temp_index_parsed)))
   expect_true(temp_index_parsed[msLevel == 2 & is.na(spec_prec), .N] == 0)
   expect_true(temp_index_parsed[msLevel == 1 & is.na(spec_prec), .N] == temp_index_parsed[msLevel == 1, .N])
   expect_true(temp_index_parsed[msLevel == 2, unique(spec_coltype)] == "hcd")
+
+  
 })
 
 test_that("Spec2Xtract::fun_check_cpd", {
@@ -24,6 +27,9 @@ test_that("Spec2Xtract::fun_check_cpd", {
   expect_true(temp_cpd[, all(is.character(compound))])
   expect_true(temp_cpd[, all(is.character(elemcomposition))])
   expect_true(temp_cpd[, all(is.integer(cpd_iter))])
+  ## Error
+  expect_error(Spec2Xtract::fun_check_cpd(data.table("qldsjkf", "compound")))
+  expect_warning(Spec2Xtract::fun_check_cpd(data.table("rtsec" = 10.5, "compound" = "A", "elemcomposition" = "C6H12")))
 })
 
 test_that('Spec2Xtract::cpd_add_ionsmass', {
@@ -51,4 +57,14 @@ test_that('Spec2Xtract::init_object', {
   expect_true(temp_init$cpd[[3]]$cpd_info$cpd_iter == 3)
   expect_true("cpdCheck" %in% names(temp_init$cpd[[3]]$cpd_info))
   expect_true(temp_init$cpd[[3]]$cpd_info$cpdCheck == TRUE)
+  ## Error file
+  f <- tempfile("test", fileext = ".raw")
+  data.table::fwrite(x = data.table("A", "C", "D"), file = f)
+  temp_init <- Spec2Xtract::init_object(files = f, cpd = Spec2Xtract:::example_cpdlist)
+  expect_true(temp_init$file$info$FileCheck == FALSE)
+  ## Error cpd
+  cpd_dt <- Spec2Xtract:::example_cpdlist
+  cpd_dt[1, elemcomposition := "NA150-lkjSDF10"]
+  temp_init <- Spec2Xtract::init_object(files = rawrr::sampleFilePath(), cpd = cpd_dt)
+  expect_true(temp_init$cpd[[1]]$cpd_info$cpdCheck == FALSE)
 })

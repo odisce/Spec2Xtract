@@ -108,6 +108,7 @@ fun_check_cpd <- function(cpd) {
   }
   if (!"inchikey" %in% names(x)) {
     warning("inchikey not found in cpd table, it may limit the export to other tools")
+    inchikey <- as.character(NA)
   }
   ## format file
   x[, cpd_iter := 1:.N]
