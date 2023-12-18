@@ -45,7 +45,8 @@ jobs:
           needs: check
 
       - name: Install rawrr Dep
-        run: system("R CMD BATCH inst/installrawrr.R")
+        run: R CMD BATCH inst/installrawrr.R
+        shell: bash {0}
 
       - uses: r-lib/actions/check-r-package@v2
         with:
