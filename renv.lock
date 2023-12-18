@@ -321,14 +321,14 @@
       "RemoteUsername": "odisce",
       "RemoteRepo": "Spec2Annot",
       "RemoteRef": "main",
-      "RemoteSha": "b5480eefaf86336b02004742ee72115bca8c3d91",
+      "RemoteSha": "7a0f66357fb1a364dcdc8b511b85c4aed5d0af38",
       "Requirements": [
         "R",
         "data.table",
         "magrittr",
         "stringr"
       ],
-      "Hash": "6869be00ad737aa88de3e7a78742b671"
+      "Hash": "de6d1f47bb7615f9d036575dbbc2c8e4"
     },
     "XML": {
       "Package": "XML",
