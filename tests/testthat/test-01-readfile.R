@@ -1,6 +1,8 @@
 test_that("Spec2Xtract::check_rawfile: .raw", {
   testthat::expect_true(
-    Spec2Xtract::check_rawfile(rawrr::sampleFilePath()) == rawrr::sampleFilePath()
+    Spec2Xtract::check_rawfile(
+      rawrr::sampleFilePath()
+    ) == rawrr::sampleFilePath()
   )
 
   f <- tempfile("test", fileext = ".raw")
@@ -15,7 +17,7 @@ test_that("Spec2Xtract::check_rawfile: .mzML", {
   testthat::expect_true(
     Spec2Xtract::check_rawfile(f) == f
   )
-  
+
   f <- tempfile("test", fileext = ".mzML")
   data.table::fwrite(x = data.table("test", "A", "B"), file = f)
   testthat::expect_error(
@@ -24,11 +26,15 @@ test_that("Spec2Xtract::check_rawfile: .mzML", {
 })
 
 test_that("Spec2Xtract::check_rawfile: .mzXML", {
-  f <- system.file("threonine/threonine_i2_e35_pH_tree.mzXML", package = "msdata")
+  f <- system.file(
+    "threonine/threonine_i2_e35_pH_tree.mzXML",
+    package = "msdata"
+  )
+
   testthat::expect_true(
     Spec2Xtract::check_rawfile(f) == f
   )
-  
+
   f <- tempfile("test", fileext = ".mzXML")
   data.table::fwrite(x = data.table("test", "A", "B"), file = f)
   testthat::expect_error(
@@ -44,4 +50,3 @@ test_that("Spec2Xtract::check_rawfile: Error file doesn't exist", {
     Spec2Xtract::check_rawfile(f)
   )
 })
-

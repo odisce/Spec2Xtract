@@ -1,0 +1,13 @@
+globalVariables(
+  c(
+    "scanType",
+    ".",
+    "compound",
+    "rtsec",
+    "rtmin",
+    "elemcomposition",
+    "cpd_iter",
+    "FileCheck",
+    "cpdCheck"
+  )
+)

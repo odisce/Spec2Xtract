@@ -9,7 +9,12 @@
 library(testthat)
 library(Spec2Xtract)
 
-system(paste0("R CMD BATCH ", system.file("installrawrr.R", package = "Spec2Xtract")))
+system(
+  paste0(
+    "R CMD BATCH ",
+    system.file("installrawrr.R", package = "Spec2Xtract")
+  )
+)
 
 
 test_check("Spec2Xtract")

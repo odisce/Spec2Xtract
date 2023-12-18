@@ -11,8 +11,9 @@ cpd_add_ionsmass(cpd)
 columns: compound, rtsec, elemcomposition and optionally inchikey}
 }
 \value{
-Return the \code{cpd} table with mz_neutral, mz_pos and mz_neg values calculated
-from the elemental composition
+Return the \code{cpd} table with:
+mz_neutral, mz_pos and mz_neg values
+calculated from the elemental composition
 }
 \description{
 Calculate ion mass from elemental composition
