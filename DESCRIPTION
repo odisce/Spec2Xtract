@@ -30,7 +30,7 @@ Imports:
     magrittr,
     MSnbase,
     mzR,
-    rawrr,
+    rawrr (>= 1.10),
     Spec2Annot,
     stringr
 Suggests: 
