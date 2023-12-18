@@ -8,6 +8,14 @@ globalVariables(
     "elemcomposition",
     "cpd_iter",
     "FileCheck",
-    "cpdCheck"
+    "cpdCheck",
+    "msLevel",
+    "spec_energy",
+    "spec_coltype",
+    "spec_polarity",
+    "spec_prec",
+    "scan_nb",
+    "MSEvent_nb",
+    "Polarity"
   )
 )

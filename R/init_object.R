@@ -74,9 +74,9 @@ parse_index_dt <- function(index_table) {
         }
       })
       pattern_res$mslevel <- msLevel
-      polarity <- gsub("^.*(\\+|\\-).*ms.*$", "\\1", scanType)
-      pattern_res$spec_polarity <- ifelse(polarity == "+", 1, 0)
     }
+    polarity <- gsub("^.*(\\+|\\-).*ms.*$", "\\1", scanType)
+    pattern_res$spec_polarity <- ifelse(polarity == "+", 1, 0)
     .(
       msLevel = as.integer(pattern_res$mslevel),
       spec_energy = pattern_res$spec_energy %>% {
