@@ -39,7 +39,7 @@ get_events_types <- function(
     selected_events <- event_table[, head(.SD, 1), by = msLevel]
     isowin_dt <- selected_events[, {
       scanType_sel <- scanType
-      scan_to_check <- index_table[scanType == scanType_sel,][1, scan]
+      scan_to_check <- index_table[scanType == scanType_sel, ][1, scan]
       isowin <- rawrr::readSpectrum(
         rawfile = raw_path,
         scan = scan_to_check,
@@ -64,7 +64,7 @@ get_events_types <- function(
   } else {
     output <- event_table[, {
       scanType_sel <- scanType
-      scan_to_check <- index_table[scanType == scanType_sel,][1, scan]
+      scan_to_check <- index_table[scanType == scanType_sel, ][1, scan]
       isowin <- rawrr::readSpectrum(
         rawfile = raw_path,
         scan = scan_to_check,
@@ -104,11 +104,11 @@ add_events <- function(
         raw_path = annobject$file$info[i, file_path],
         firstevent = firstevent
       )
-      output[, MSEvent_index := 1:.N]
+      output[, MSEvent_index := seq_len(.N)]
       annobject$file$MSEvents[[i]] <- output[]
       ## Add info in fileinfo
       annobject$file$info[i,
-       MSEvent_nb := output[, .N]
+        MSEvent_nb := output[, .N]
       ]
       annobject$file$info[i,
         Polarity := output[,

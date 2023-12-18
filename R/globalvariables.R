@@ -16,6 +16,9 @@ globalVariables(
     "spec_prec",
     "scan_nb",
     "MSEvent_nb",
-    "Polarity"
+    "Polarity",
+    "isolation_window",
+    "file_path",
+    "MSEvent_index"
   )
 )
