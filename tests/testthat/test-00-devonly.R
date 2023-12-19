@@ -4,7 +4,7 @@ test_that("TODO", {
   ## Implementing:
   # init_object:           OK
   # add_events:            OK
-  # add_cpd_events:        TODO
+  # add_cpd_events:        OK
   # add_xics:              TODO
   # add_best_peaks:        TODO
   # add_events_to_extract: TODO

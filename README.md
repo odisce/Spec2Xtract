@@ -13,7 +13,7 @@ acquired on [Thermo](https://www.thermofisher.com) instrument by using [mzR](htt
 or [rawrr](https://github.com/fgcz/rawrr) respectively. The package is compatible with multi-energy acquisition, 
 extracting one spectra for every energy used in the file. Spectra annotation can be performed by using 
 [**Spec2Annot**](https://github.com/odisce/Spec2Annot). An implementation on 
-[Galaxy](https://workflow4metabolomics.usegalaxy.fr/) of those functionalities are under progress.
+[Galaxy](https://workflow4metabolomics.usegalaxy.fr/) of those functionalities is under progress.
 
 ## Installation
 

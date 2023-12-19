@@ -36,7 +36,7 @@ get_events_types <- function(
   ]
 
   if (firstevent == TRUE) {
-    selected_events <- event_table[, head(.SD, 1), by = msLevel]
+    selected_events <- event_table[, utils::head(.SD, 1), by = msLevel]
     isowin_dt <- selected_events[, {
       scanType_sel <- scanType
       scan_to_check <- index_table[scanType == scanType_sel, ][1, scan]

@@ -135,7 +135,7 @@ test_that("Spec2Xtract::init_object", {
   )
   expect_true(temp_init$file$info$FileCheck == FALSE)
   ## Error cpd
-  cpd_dt <- Spec2Xtract:::example_cpdlist
+  cpd_dt <- copy(Spec2Xtract:::example_cpdlist)
   cpd_dt[1, elemcomposition := "NA150-lkjSDF10"]
   temp_init <- Spec2Xtract::init_object(
     files = rawrr::sampleFilePath(),

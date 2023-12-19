@@ -29,7 +29,6 @@ Imports:
     lifecycle,
     magrittr,
     MSnbase,
-    mzR,
     rawrr (>= 1.10),
     Spec2Annot,
     stringr

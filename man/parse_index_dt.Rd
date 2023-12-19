@@ -7,7 +7,8 @@
 parse_index_dt(index_table)
 }
 \arguments{
-\item{index_table}{Index table returned by \code{get_rawindex}}
+\item{index_table}{The index table as returned by
+\code{Spec2Xtract::get_rawindex()}}
 }
 \value{
 Add the following columns to \code{index_table}:

@@ -21,7 +21,7 @@ get_rawindex <- function(rawpath) {
 
 #' Extract ms level and collision type, energy from index
 #'
-#' @param index_table Index table returned by \code{get_rawindex}
+#' @inheritParams get_events_types
 #'
 #' @import data.table magrittr
 #'
