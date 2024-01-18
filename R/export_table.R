@@ -121,7 +121,6 @@ get_event_summary <- function(annobject) {
 #' @return
 #' @export
 #'
-#' @examples
 export_spectrum_table <- function(annobject, save_dir) {
   for (cpdi in 1:length(annobject$cpd)) {
     # cpdi <- 1
@@ -134,7 +133,7 @@ export_spectrum_table <- function(annobject, save_dir) {
               save_file <- event_to_get[speci, paste0("CPD", cpdi, "_File", FileIndex, "_Spectrum", SpectrumIndex, ".xlsx")]
               save_path <- file.path(save_dir, save_file)
               openxlsx::write.xlsx(
-                x = annobject$cpd[[cpdi]]$MSspectra$spectra[[event_to_get[speci, SpectrumIndex]]]$spectra_db,
+                x = annobject$cpd[[cpdi]]$MSspectra$spectra[[event_to_get[speci, SpectrumIndex]]]$spectra_db[order(-mz)],
                 file = save_path
               )
             }
