@@ -38,7 +38,7 @@ test_that("Spec2Xtract::parse_index_dt", {
 })
 
 test_that("Spec2Xtract::fun_check_cpd", {
-  temp_cpd <- Spec2Xtract::fun_check_cpd(Spec2Xtract:::example_cpdlist)
+  temp_cpd <- Spec2Xtract::fun_check_cpd(Spec2Xtract:::example_cpdlist_realdt)
   expect_true(is.data.table(temp_cpd))
   expect_true(
     all(
@@ -76,7 +76,7 @@ test_that("Spec2Xtract::fun_check_cpd", {
 })
 
 test_that("Spec2Xtract::cpd_add_ionsmass", {
-  temp_cpd <- Spec2Xtract::fun_check_cpd(Spec2Xtract:::example_cpdlist)
+  temp_cpd <- Spec2Xtract::fun_check_cpd(Spec2Xtract:::example_cpdlist_realdt)
   temp_cpd_supp <- Spec2Xtract::cpd_add_ionsmass(temp_cpd)
   expect_true(is.data.table(temp_cpd_supp))
   expect_true(all(dim(temp_cpd_supp) == dim(temp_cpd) + c(0, 3)))
@@ -111,7 +111,7 @@ test_that("Spec2Xtract::cpd_add_ionsmass", {
 test_that("Spec2Xtract::init_object", {
   temp_init <- Spec2Xtract::init_object(
     files = rawrr::sampleFilePath(),
-    cpd = Spec2Xtract:::example_cpdlist
+    cpd = Spec2Xtract:::example_cpdlist_realdt
   )
   expect_true(is.list(temp_init))
   expect_true(all(c("file", "cpd") %in% names(temp_init)))
@@ -119,23 +119,23 @@ test_that("Spec2Xtract::init_object", {
   expect_true(all(c("info", "index") %in% names(temp_init$file)))
   expect_true(nrow(temp_init$file$info) == 1)
   expect_true(length(temp_init$file$index) == 1)
-  expect_true(length(temp_init$cpd) == nrow(Spec2Xtract:::example_cpdlist))
+  expect_true(length(temp_init$cpd) == nrow(Spec2Xtract:::example_cpdlist_realdt))
   expect_true("cpd_info" %in% names(temp_init$cpd[[1]]))
   expect_true(is.data.table(temp_init$cpd[[1]]$cpd_info))
   expect_true(temp_init$cpd[[1]]$cpd_info$cpd_iter == 1)
-  expect_true(temp_init$cpd[[3]]$cpd_info$cpd_iter == 3)
-  expect_true("cpdCheck" %in% names(temp_init$cpd[[3]]$cpd_info))
-  expect_true(temp_init$cpd[[3]]$cpd_info$cpdCheck == TRUE)
+  expect_true(temp_init$cpd[[2]]$cpd_info$cpd_iter == 2)
+  expect_true("cpdCheck" %in% names(temp_init$cpd[[2]]$cpd_info))
+  expect_true(temp_init$cpd[[2]]$cpd_info$cpdCheck == TRUE)
   ## Error file
   f <- tempfile("test", fileext = ".raw")
   data.table::fwrite(x = data.table("A", "C", "D"), file = f)
   temp_init <- Spec2Xtract::init_object(
     files = f,
-    cpd = Spec2Xtract:::example_cpdlist
+    cpd = Spec2Xtract:::example_cpdlist_realdt
   )
   expect_true(temp_init$file$info$FileCheck == FALSE)
   ## Error cpd
-  cpd_dt <- copy(Spec2Xtract:::example_cpdlist)
+  cpd_dt <- copy(Spec2Xtract:::example_cpdlist_realdt)
   cpd_dt[1, elemcomposition := "NA150-lkjSDF10"]
   temp_init <- Spec2Xtract::init_object(
     files = rawrr::sampleFilePath(),

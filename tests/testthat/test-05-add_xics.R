@@ -1,10 +1,10 @@
 test_that("Spec2Xtract::add_xics", {
   temp_init <- Spec2Xtract::init_object(
     files = rawrr::sampleFilePath(),
-    cpd = Spec2Xtract:::example_cpdlist
+    cpd = Spec2Xtract:::example_cpdlist_realdt
   )
   temp_event <- Spec2Xtract::add_events(
-    temp_init,
+    annobject = temp_init,
     firstevent = TRUE
   )
   temp_events <- Spec2Xtract::add_cpd_events(temp_event, prec_ppm = 10)

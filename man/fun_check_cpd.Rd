@@ -17,6 +17,6 @@ Return a formated data.table with compound informations
 Check compound file
 }
 \examples{
-fun_check_cpd(Spec2Xtract:::example_cpdlist)
+fun_check_cpd(Spec2Xtract:::example_cpdlist_realdt)
 
 }

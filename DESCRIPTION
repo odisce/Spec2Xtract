@@ -19,16 +19,16 @@ Depends:
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
+biocViews:
 Imports: 
     Biobase,
+    BiocGenerics,
     data.table,
-    future,
-    future.apply,
-    ggplot2,
-    ggpubr,
     lifecycle,
     magrittr,
+    MassSpecWavelet,
     MSnbase,
+    openxlsx,
     rawrr (>= 1.10),
     Spec2Annot,
     stringr

@@ -175,8 +175,8 @@ add_xics <- function(
                 nrow(annobject$cpd[[i]]$MSEvents[FileIndex == file_i]) == 0
             )
         ) {
-          next
-        }
+          return(NULL)
+        } else {
         cpd_events_i <- merge(
           annobject$cpd[[i]]$MSEvents[FileIndex == file_i],
           annobject$file$MSEvents[[file_i]],
@@ -218,7 +218,8 @@ add_xics <- function(
         ) %>%
           rbindlist()
         file_xics[, FileIndex := file_i]
-        return(file_xics)
+        return(file_xics[])
+        }
       }
     ) %>%
       rbindlist()

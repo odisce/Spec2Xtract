@@ -3,7 +3,7 @@ test_that("Spec2Xtract::add_events", {
   require(data.table)
   temp_init <- Spec2Xtract::init_object(
     files = rawrr::sampleFilePath(),
-    cpd = Spec2Xtract:::example_cpdlist
+    cpd = Spec2Xtract:::example_cpdlist_realdt
   )
   temp_event <- Spec2Xtract::add_events(
     temp_init,
