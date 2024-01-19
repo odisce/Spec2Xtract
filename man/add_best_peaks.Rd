@@ -4,13 +4,15 @@
 \alias{add_best_peaks}
 \title{Add peaks detection to annobject}
 \usage{
-add_best_peaks(annobject, minscan = 3, debug = FALSE)
+add_best_peaks(annobject, minscan = 3, rt_limit = NULL, debug = FALSE)
 }
 \arguments{
 \item{annobject}{Object build with \code{Spec2Extract::init_object()}}
 
 \item{minscan}{numeric value for the minimum number of scan
 inside a peak to keep it}
+
+\item{rt_limit}{limit rt deviation from reference when searching peaks}
 
 \item{debug}{Logical to show log messages (\code{TRUE}) or not (\code{FALSE})}
 }

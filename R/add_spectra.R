@@ -7,7 +7,7 @@
 #' @import data.table magrittr
 #'
 #' @return
-#' A list of spectra as `spectrum_list` but with 
+#' A list of spectra as `spectrum_list` but with
 #' formatted column and types.
 #'
 #' @export
@@ -116,7 +116,8 @@ parse_spectrum_object <- function(
       }
       temp_i <- data.table::data.table(
         "mz" = spectrum_i[[mz_col]],
-        "i" = spectrum_i[[i_col]]
+        "i" = spectrum_i[[i_col]],
+        "mz_mode" = mz_mode
       )
       if (!is.null(mz_range)) {
         temp_i <- temp_i[
@@ -150,9 +151,6 @@ parse_spectrum_object <- function(
 #'
 #' @export
 #'
-#' @examples
-#' get_spectrum_db(12, rawrr::sampleFilePath())
-#'
 get_spectrum_db <- function(ms_scan_to_get, rawpath) {
   scan_vi <- ms_scan_to_get[, unique(scan)]
   ms_spectrum <- rawrr::readSpectrum(
@@ -169,7 +167,9 @@ get_spectrum_db <- function(ms_scan_to_get, rawpath) {
   col_info <- ms_spectrum[[1]][,
     - c("mz", "i")
   ][,
-    lapply(.SD, function(x) {length(unique(x))})
+    lapply(.SD, function(x) {
+      length(unique(x))
+    })
   ] %>%
     {
       unlist(.) %>%

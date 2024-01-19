@@ -1,6 +1,7 @@
 #' Calculate peak scores
 #'
-#' @param xic_peaks Peak list as returned by `Spec2Xtract::get_peaks_from_cpdsXIC()`
+#' @param xic_peaks Peak list as returned by
+#'                  `Spec2Xtract::get_peaks_from_cpdsXIC()`
 #' @param cpd_events Compound MS(n) event slot
 #' @param cpd_iter (optional) Compound iteration ID to use
 #' @param cpd_info Compound Info slot
@@ -51,14 +52,14 @@ get_peak_scores <- function(xic_peaks, cpd_events, cpd_iter = NULL, cpd_info) {
               )
             ],
             by = "filter",
-            all.x = T
+            all.x = TRUE
           )
         }
 
       output_i <- data.table(
         "peak_in_range" = temp_dt[, .N],
         "peaks_mslevels" = temp_dt[, paste0(unique(msLevel), collapse = "/")],
-        "diff_from_ref" = abs(rt_ref - cpd_info$rtsec)
+        "diff_from_ref" = abs(rt_ref - cpd_info$rtmin)
       ) %>%
         {
           cbind(cpd_dt_i[i, ], .)
@@ -66,10 +67,11 @@ get_peak_scores <- function(xic_peaks, cpd_events, cpd_iter = NULL, cpd_info) {
       output <- rbind(output, output_i)
     }
     output[, niter := seq_len(.N)]
+    max_into <- output[, max(into, na.rm = TRUE)]
     output[,
       peak_score := c(
         (1 / zigzag_score),
-        ((into / max(into)) * 15),
+        ((into / max_into) * 15),
         (1 / diff_from_ref * 2),
         peak_in_range * 3,
         ifelse(
@@ -95,7 +97,7 @@ get_peak_scores <- function(xic_peaks, cpd_events, cpd_iter = NULL, cpd_info) {
           na.omit(.)
         } %>%
         {
-          sum()
+          sum(.)
         },
       by = niter
     ]
@@ -108,7 +110,7 @@ get_peak_scores <- function(xic_peaks, cpd_events, cpd_iter = NULL, cpd_info) {
 
 #' Use MassSpecWavelet to detect peaks
 #'
-#' @param xic The XIC as a data.table with the columns: 
+#' @param xic The XIC as a data.table with the columns:
 #'            'scan' and 'i'.
 #' @param direction Character to choose the right 'R' or left 'L'
 #'                  side of the peak
@@ -118,7 +120,7 @@ get_peak_scores <- function(xic_peaks, cpd_events, cpd_iter = NULL, cpd_info) {
 #' @return
 #' A numeric value corresponding to the scan on the right `R` or
 #' left `L` side of the peak.
-#' 
+#'
 #' @export
 #'
 get_peak_range <- function(xic, direction = c("R", "L"), peak_sel_center) {
@@ -133,19 +135,27 @@ get_peak_range <- function(xic, direction = c("R", "L"), peak_sel_center) {
     stop("direction arg not one of 'L' or 'R'")
   }
 
-  if (nrow(temp_side[i_n > 0,]) > 0) {
+  if (nrow(temp_side[i_n > 0, ]) > 0) {
     output <- switch(
       direction,
-      "R" = {temp_side[i_n > 0,][, min(scan)]},
-      "L" = {temp_side[i_n > 0,][, max(scan)]},
+      "R" = {
+        temp_side[i_n > 0, ][, min(scan)]
+      },
+      "L" = {
+        temp_side[i_n > 0, ][, max(scan)]
+      },
       stop("direction arg not one of 'L' or 'R'")
     )
     return(output)
   } else {
     output <- switch(
       direction,
-      "R" = {temp_side[, max(scan)]},
-      "L" = {temp_side[, min(scan)]},
+      "R" = {
+        temp_side[, max(scan)]
+      },
+      "L" = {
+        temp_side[, min(scan)]
+      },
       stop("direction arg not one of 'L' or 'R'")
     )
     return(output)
@@ -199,8 +209,6 @@ detect_centwave_peaks <- function(vecint, snrth = 3, majpeakonly = TRUE, ...) {
     output <- lapply(
       peak_to_get,
       function(peak_sel_name) {
-        peak_sel_ridges <-
-          peak_info$ridgeList[[peak_sel_name]]
         peak_sel_apex <-
           peak_info$majorPeakInfo$allPeakIndex[[peak_sel_name]]
         peak_sel_center <-
@@ -234,6 +242,7 @@ detect_centwave_peaks <- function(vecint, snrth = 3, majpeakonly = TRUE, ...) {
           "maxo" = max(vecint[scmin:scmax], na.rm = TRUE),
           "sn" = peak_sel_sn
         )
+        return(peak_info_dt)
       }
     )
     data.table::rbindlist(output, fill = TRUE)
@@ -252,19 +261,18 @@ detect_centwave_peaks <- function(vecint, snrth = 3, majpeakonly = TRUE, ...) {
 #' @examples
 #' calculate_zigzag(rnorm(100, 1e5, sd = 1e3))
 #' calculate_zigzag(rnorm(100, 1e5, sd = 1e3))
-calculate_zigzag <- function (vecint) {
+calculate_zigzag <- function(vecint) {
   if (length(vecint) > 4) {
     eic <- vecint
     end <- length(eic)
-    EPI = max(eic) - (eic[1] + eic[2] + eic[end] + eic[end - 1]) / 4
-    zig_zag_sum = 0
+    epi <- max(eic) - (eic[1] + eic[2] + eic[end] + eic[end - 1]) / 4
+    zig_zag_sum <- 0
     for (i in 2:(end - 1)) {
-      local_zig_zag = (2 * eic[i] - eic[i - 1] - eic[i + 1])^2
-      zig_zag_sum = zig_zag_sum + local_zig_zag
+      local_zig_zag <- (2 * eic[i] - eic[i - 1] - eic[i + 1])^2
+      zig_zag_sum <- zig_zag_sum + local_zig_zag
     }
-    zig_zag_index = zig_zag_sum / (EPI^2 * end)
-  }
-  else {
+    zig_zag_index <- zig_zag_sum / (epi^2 * end)
+  } else {
     zig_zag_index <- NA
   }
   return(zig_zag_index)
@@ -305,9 +313,12 @@ get_peaks_xic <- function(xic_mat, minscan = 3, majpeakonly = FALSE) {
   }
   xic_mat <- xic_mat[order(rt)]
   xic_mat[, scan_nb := seq_len(.N)]
-  peak_dt <- detect_centwave_peaks(vecint = xic_mat$i, majpeakonly = majpeakonly)
+  peak_dt <- detect_centwave_peaks(
+    vecint = xic_mat$i,
+    majpeakonly = majpeakonly
+  )
   if (!is.null(minscan)) {
-    peak_dt <- peak_dt[(scmax-scmin) >= minscan, ]
+    peak_dt <- peak_dt[(scmax - scmin) >= minscan, ]
   }
   peak_dt[, rtmin := xic_mat[scmin, rt]]
   peak_dt[, rtmax := xic_mat[scmax, rt]]
@@ -323,6 +334,7 @@ get_peaks_xic <- function(xic_mat, minscan = 3, majpeakonly = FALSE) {
     zigzag_score <- calculate_zigzag(xic_i[order(scan_nb), i])
     .(scan_nb = scan_nb, zigzag_score = as.numeric(zigzag_score))
   }, by = names(peak_dt)]
+
   return(output[])
 }
 
@@ -347,6 +359,7 @@ get_peaks_from_cpdsXIC <- function(xic_cpd, minscan = 4) {
       xic_mat = .SD[, .(rt, i)],
       minscan = minscan
     )
+    peak_out
   }, by = .(cpd_iter, filter)]
 
   return(output)
@@ -373,6 +386,7 @@ fun_best_peaks <- function(pk_scores) {
 
 #' Add peaks detection to annobject
 #'
+#' @param rt_limit limit rt deviation from reference when searching peaks
 #' @inheritParams add_events
 #' @inheritParams add_xics
 #' @inheritParams get_peaks_xic
@@ -383,7 +397,12 @@ fun_best_peaks <- function(pk_scores) {
 #'
 #' @export
 #'
-add_best_peaks <- function(annobject, minscan = 3, debug = FALSE) {
+add_best_peaks <- function(
+  annobject,
+  minscan = 3,
+  rt_limit = NULL,
+  debug = FALSE
+) {
   ## Select cpd with XICs
   cpd_to_get <- sapply(annobject$cpd, function(x) {
     nrow(x$XICs) > 0
@@ -401,7 +420,16 @@ add_best_peaks <- function(annobject, minscan = 3, debug = FALSE) {
         if (isTRUE(debug)) {
           message(x$FileIndex %>% unique(), "-", appendLF = FALSE)
         }
+        ## Add cpd_iter in x
+        cpd_iter_i <- i
+        x[, cpd_iter := cpd_iter_i]
         xic_peaks <- get_peaks_from_cpdsXIC(xic_cpd = x, minscan = minscan)
+        if (!is.null(rt_limit) && nrow(xic_peaks) > 0) {
+          rt_lim_range <- annobject$cpd[[i]]$cpd_info$rtmin +
+            c(-rt_limit, +rt_limit)
+          xic_peaks <- xic_peaks[rt %between% rt_lim_range]
+        }
+
         pk_scores_dt <- get_peak_scores(
           xic_peaks = xic_peaks,
           cpd_events = annobject$file$MSEvents[[unique(x$FileIndex)]][

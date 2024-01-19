@@ -22,7 +22,3 @@ spectrum.
 \description{
 Extract spectrum
 }
-\examples{
-get_spectrum_db(12, rawrr::sampleFilePath())
-
-}

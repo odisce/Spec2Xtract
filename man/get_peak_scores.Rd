@@ -7,7 +7,8 @@
 get_peak_scores(xic_peaks, cpd_events, cpd_iter = NULL, cpd_info)
 }
 \arguments{
-\item{xic_peaks}{Peak list as returned by \code{Spec2Xtract::get_peaks_from_cpdsXIC()}}
+\item{xic_peaks}{Peak list as returned by
+\code{Spec2Xtract::get_peaks_from_cpdsXIC()}}
 
 \item{cpd_events}{Compound MS(n) event slot}
 

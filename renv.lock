@@ -287,7 +287,7 @@
       "RemoteUsername": "odisce",
       "RemoteRepo": "Spec2Annot",
       "RemoteRef": "main",
-      "RemoteSha": "f9dae5d6a469cad6892e95fcd05319a6f8bb6a90",
+      "RemoteSha": "6092fe847d8a0adf8bb4aef5a00f6400d9fd1c99",
       "Requirements": [
         "R",
         "Rcpp",
@@ -295,7 +295,7 @@
         "magrittr",
         "stringr"
       ],
-      "Hash": "e594fb538244e39dd150802bdd24dfdb"
+      "Hash": "6dfbaa2f9ef2d57eb945073e8b079cc7"
     },
     "XML": {
       "Package": "XML",
@@ -752,6 +752,23 @@
       ],
       "Hash": "8d1938040a05566f4f7a14af4feadd6b"
     },
+    "openxlsx": {
+      "Package": "openxlsx",
+      "Version": "4.2.5.2",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "Rcpp",
+        "grDevices",
+        "methods",
+        "stats",
+        "stringi",
+        "utils",
+        "zip"
+      ],
+      "Hash": "c03b4c18d42da881fb8e15a085c2b9d6"
+    },
     "pcaMethods": {
       "Package": "pcaMethods",
       "Version": "1.94.0",
@@ -985,6 +1002,13 @@
         "stats"
       ],
       "Hash": "4b25e70111b7d644322e9513f403a272"
+    },
+    "zip": {
+      "Package": "zip",
+      "Version": "2.3.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "d98c94dacb7e0efcf83b0a133a705504"
     },
     "zlibbioc": {
       "Package": "zlibbioc",

@@ -25,54 +25,20 @@ testthat::test_that("Real data", {
   require(data.table)
   require(magrittr)
   example_cpdlist_realdt <- Spec2Xtract:::example_cpdlist_realdt
-  annoobj_test <- Spec2Xtract::init_object(
+  save_dir <- tempdir()
+
+  temp_res <- xtract_spectra(
     files = file_path,
-    cpd = example_cpdlist_realdt
-  )
-
-  annoobj_test <- Spec2Xtract::add_events(
-    annobject = annoobj_test,
-    firstevent = TRUE
-  )
-
-  annoobj_test <- Spec2Xtract::add_cpd_events(
-    annobject = annoobj_test,
-    prec_ppm = 3
-  )
-
-  annoobj_test <- Spec2Xtract::add_xics(
-    annobject = annoobj_test,
+    cpd = example_cpdlist_realdt,
+    firstevent = TRUE,
+    prec_ppm = 10,
     ms1 = TRUE,
-    debug = TRUE
+    rt_limit = 1,
+    ppm = 5,
+    save_dir = save_dir,
+    debug = FALSE
   )
 
-  annoobj_test <- Spec2Xtract::add_best_peaks(
-    annobject = annoobj_test,
-    debug = TRUE
-  )
-
-  annoobj_test <- Spec2Xtract::add_events_to_extract(
-    annobject = annoobj_test,
-    debug = TRUE
-  )
-
-  annoobj_test <- Spec2Xtract::add_spectra(
-    annobject = annoobj_test
-  )
-
-  annoobj_test <- Spec2Xtract::add_mspurity(
-    annobject = annoobj_test,
-    debug = TRUE
-  )
-
-   annoobj_test <- Spec2Xtract::add_annot(
-        annobject = annoobj_test,
-        ppm = 5
-   )
-
-  Spec2Xtract::export_tables(
-    annobject = annoobj_test,
-    save_dir = temp_dir
-  )
-  
+  expect_true(is.list(temp_res))
+  expect_true(all(c("file", "cpd") %in% names(temp_res)))
 })

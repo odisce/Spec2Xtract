@@ -11,11 +11,17 @@
 #'
 get_events_scans <- function(cpd_events, pk_best, index_table) {
   if (!"cpd_iter" %in% names(cpd_events)) {
-    cpd_events[, cpd_iter := 1]
+    if (
+      ("cpd_iter" %in% names(pk_best)) &&
+        (pk_best[, length(unique(cpd_iter))] == 1)
+    ) {
+      cpd_events[, cpd_iter := pk_best[, unique(cpd_iter)]]
+    } else {
+      cpd_events[, cpd_iter := 1]
+      pk_best[, cpd_iter := 1]
+    }
   }
-  if (!"cpd_iter" %in% names(pk_best)) {
-    pk_best[, cpd_iter := 1]
-  }
+
   output <-  cpd_events[, {
     cpd_iter_i <- unique(cpd_iter)
     pk_info <- pk_best[cpd_iter == cpd_iter_i, ]
@@ -50,7 +56,7 @@ get_events_scans <- function(cpd_events, pk_best, index_table) {
     ms2_scan <- ms2_scan[,
       .SD[
         which.min(
-          abs(StartTime - (pk_info$rt * 60))
+          abs(StartTime - (pk_info$rt))
         ),
       ],
       by = .(
@@ -68,8 +74,8 @@ get_events_scans <- function(cpd_events, pk_best, index_table) {
       spec_polarity,
       spec_prec,
       scanType,
-      rtsec = as.numeric(StartTime),
-      rtmin = as.numeric(StartTime) / 60,
+      rtsec = as.numeric(StartTime) * 60,
+      rtmin = as.numeric(StartTime),
       masterScan = as.integer(masterScan)
     )]
   }, by = .(cpd_iter)]
@@ -97,7 +103,7 @@ add_events_to_extract <- function(annobject, debug = FALSE) {
     if (isTRUE(debug)) {
       message("cpd: ", i, " file: ", appendLF = FALSE)
     }
-    annobject$cpd[[i]]
+    # annobject$cpd[[i]]
     output_dt <- data.table()
     for (filei in annobject$cpd[[i]]$Peaks$FileIndex) {
       if (isTRUE(debug)) {
