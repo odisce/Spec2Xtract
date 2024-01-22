@@ -9,6 +9,7 @@
 #' @inheritParams add_spectra
 #' @inheritParams add_mspurity
 #' @inheritParams add_annot
+#' @inheritParams export_tables
 #'
 #' @return
 #' If save_dir is not null, export the spectra and summary there.

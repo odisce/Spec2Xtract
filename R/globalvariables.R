@@ -26,6 +26,7 @@ globalVariables(
     "irel",
     "isolation_window",
     "IsoPurity",
+    "IsoPurity_mean",
     "masterScan",
     "MSEvent_index",
     "MSEvent_nb",

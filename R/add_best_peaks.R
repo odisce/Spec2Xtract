@@ -115,7 +115,6 @@ get_peak_scores <- function(xic_peaks, cpd_events, cpd_iter = NULL, cpd_info) {
 #' @param direction Character to choose the right 'R' or left 'L'
 #'                  side of the peak
 #' @param peak_sel_center Scan corresponding to the peak apex.
-#' @param ... Other options passed to `MassSpecWavelet::peakDetectionCWT()`
 #' @import data.table
 #' @return
 #' A numeric value corresponding to the scan on the right `R` or

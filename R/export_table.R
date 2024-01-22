@@ -1,11 +1,8 @@
 #' Title
 #'
-#' @param annobject
+#' @inheritParams add_events
 #'
-#' @return
 #' @export
-#'
-#' @examples
 get_summary <- function(annobject) {
   output <- data.table()
   for (cpd_ind in seq_len(length(annobject$cpd))) {
@@ -90,12 +87,9 @@ get_summary <- function(annobject) {
 
 #' Title
 #'
-#' @param annobject
+#' @inheritParams add_events
 #'
-#' @return
 #' @export
-#'
-#' @examples
 get_event_summary <- function(annobject) {
   output <- data.table()
   for (cpdi in seq_len(length(annobject$cpd))) {
@@ -150,12 +144,11 @@ get_event_summary <- function(annobject) {
   }
 }
 
-#' Title
+#' Write spectrum to table
 #'
-#' @param annobject
-#' @param save_dir
+#' @param save_dir Directory to save each spectrum
+#' @inheritParams add_events
 #'
-#' @return
 #' @export
 #'
 export_spectrum_table <- function(annobject, save_dir) {
@@ -204,10 +197,9 @@ export_spectrum_table <- function(annobject, save_dir) {
 
 #' Export spectra as tables
 #'
-#' @param annobject
-#' @param save_dir
+#' @inheritParams add_events
+#' @param save_dir Directory to save tables
 #'
-#' @return
 #' @import data.table openxlsx magrittr
 #' @export
 export_tables <- function(annobject, save_dir) {

@@ -7,7 +7,9 @@
 export_tables(annobject, save_dir)
 }
 \arguments{
-\item{save_dir}{}
+\item{annobject}{Object build with \code{Spec2Extract::init_object()}}
+
+\item{save_dir}{Directory to save tables}
 }
 \description{
 Export spectra as tables

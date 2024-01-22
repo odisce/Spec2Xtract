@@ -14,8 +14,6 @@ get_peak_range(xic, direction = c("R", "L"), peak_sel_center)
 side of the peak}
 
 \item{peak_sel_center}{Scan corresponding to the peak apex.}
-
-\item{...}{Other options passed to \code{MassSpecWavelet::peakDetectionCWT()}}
 }
 \value{
 A numeric value corresponding to the scan on the right \code{R} or

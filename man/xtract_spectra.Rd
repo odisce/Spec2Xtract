@@ -34,6 +34,8 @@ columns: compound, rtsec, elemcomposition and optionally inchikey}
 \item{ppm}{mass deviation for elemental composition
 search in ppm}
 
+\item{save_dir}{Directory to save tables}
+
 \item{debug}{Logical to show log messages (\code{TRUE}) or not (\code{FALSE})}
 }
 \value{

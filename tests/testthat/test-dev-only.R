@@ -11,7 +11,7 @@ test_that("TODO", {
   # add_spectra:           OK to test
   # add_mspurity:          OK to test
   # add_annot:             OK to test
-  # export_tables:         TODO
+  # export_tables:         OK to test
 
   # renv::update("Spec2Annot", prompt = FALSE)
   # renv::snapshot(type = "explicit", prompt = FALSE)

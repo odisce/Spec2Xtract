@@ -2,13 +2,15 @@
 % Please edit documentation in R/export_table.R
 \name{export_spectrum_table}
 \alias{export_spectrum_table}
-\title{Title}
+\title{Write spectrum to table}
 \usage{
 export_spectrum_table(annobject, save_dir)
 }
 \arguments{
-\item{save_dir}{}
+\item{annobject}{Object build with \code{Spec2Extract::init_object()}}
+
+\item{save_dir}{Directory to save each spectrum}
 }
 \description{
-Title
+Write spectrum to table
 }

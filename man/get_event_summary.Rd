@@ -7,7 +7,7 @@
 get_event_summary(annobject)
 }
 \arguments{
-\item{annobject}{}
+\item{annobject}{Object build with \code{Spec2Extract::init_object()}}
 }
 \description{
 Title
