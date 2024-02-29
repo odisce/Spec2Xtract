@@ -12,7 +12,8 @@ run_Spec2Xtract(
   minscan,
   rt_limit,
   ppm,
-  save_dir
+  save_dir,
+  ncore = 1
 )
 }
 \arguments{
@@ -35,6 +36,8 @@ inside a peak to keep it}
 search in ppm}
 
 \item{save_dir}{Directory to save tables}
+
+\item{ncore}{Number of parallel workers}
 }
 \description{
 This function run a full targets pipeline from

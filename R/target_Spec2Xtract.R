@@ -11,7 +11,7 @@
 #' @inheritParams add_annot
 #' @inheritParams export_tables
 #' @return A list of targets objects.
-#' @import targets tarchetypes data.table magrittr ggplot2 ggpubr dplyr
+#' @import targets tarchetypes data.table magrittr ggplot2 ggpubr
 #' @export
 #' @examples
 #' \dontrun{
@@ -891,6 +891,7 @@ target_Spec2Xtract <- function(
 #' @param files_dir path to the directory containing the
 #'                  .raw files
 #' @param cpd_path path to the table with compound informations
+#' @param ncore Number of parallel workers
 #' @inheritParams target_Spec2Xtract
 #' @import targets openxlsx data.table magrittr
 #' @export
@@ -902,7 +903,8 @@ run_Spec2Xtract <- function(
   minscan,
   rt_limit,
   ppm,
-  save_dir
+  save_dir,
+  ncore = 1
 ) {
   dir.create(save_dir)
   if (!file.exists(cpd_path)) {
@@ -924,7 +926,15 @@ run_Spec2Xtract <- function(
             } else if (table_ext %in% c("csv", "tsv", "txt")) {
               cpd_dt <- data.table::fread(cpd_path)
             }
-            
+
+            targets::tar_option_set(
+              packages = c("data.table", "magrittr", "Spec2Xtract")
+            )
+
+            tar_option_set(
+              controller = crew::crew_controller_local(workers = ncore)
+            )
+
             list(
               Spec2Xtract::target_Spec2Xtract(
                 files = list.files(
