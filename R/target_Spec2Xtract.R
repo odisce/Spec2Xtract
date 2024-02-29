@@ -917,10 +917,10 @@ run_Spec2Xtract <- function(
       {
         targets::tar_script(
           {
-            library(Spec2Xtract)
-            library(magrittr)
-            library(data.table)
-            
+            requireNamespace("Spec2Xtract", quietly=TRUE)
+            requireNamespace("magrittr", quietly=TRUE)
+            requireNamespace("data.table", quietly=TRUE)
+
             table_ext <- tools::file_ext(cpd_path)       
             if (table_ext == "xlsx") {
               cpd_dt <- openxlsx::read.xlsx(cpd_path) %>%
@@ -952,7 +952,13 @@ run_Spec2Xtract <- function(
       },
       list(
         cpd_path = eval(cpd_path),
-        files_dir = eval(files_dir)
+        files_dir = eval(files_dir),
+        firstevent = eval(firstevent),
+        prec_ppm = eval(prec_ppm),
+        minscan = eval(minscan),
+        rt_limit = eval(rt_limit),
+        ppm = eval(ppm),
+        save_dir = eval(save_dir)
       )
     )
   )
