@@ -911,26 +911,22 @@ run_Spec2Xtract <- function(
   if (!dir.exists(files_dir)) {
     stop("files_dir doesn't exist it must be a directory with .raw files")
   }
-
+  
   eval(
     substitute(
       {
         targets::tar_script(
           {
-            requireNamespace("Spec2Xtract", quietly=TRUE)
-            requireNamespace("magrittr", quietly=TRUE)
-            requireNamespace("data.table", quietly=TRUE)
-
             table_ext <- tools::file_ext(cpd_path)       
             if (table_ext == "xlsx") {
-              cpd_dt <- openxlsx::read.xlsx(cpd_path) %>%
-                data.table::as.data.table()
+              cpd_in <- openxlsx::read.xlsx(cpd_path)
+              cpd_dt <- data.table::as.data.table(cpd_in)
             } else if (table_ext %in% c("csv", "tsv", "txt")) {
               cpd_dt <- data.table::fread(cpd_path)
             }
             
             list(
-              target_Spec2Xtract(
+              Spec2Xtract::target_Spec2Xtract(
                 files = list.files(
                   files_dir,
                   pattern = "\\.raw$",
