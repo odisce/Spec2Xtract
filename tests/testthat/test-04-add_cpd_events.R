@@ -16,7 +16,7 @@ test_that("Spec2Xtract::add_events", {
     all(
       c(
         "FileIndex",
-        "MSEvent_index"
+        "EventIndex"
       ) %in% names(temp_events$cpd[[1]]$MSEvents)
     )
   )

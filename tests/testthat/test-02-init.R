@@ -47,7 +47,7 @@ test_that("Spec2Xtract::fun_check_cpd", {
         "elemcomposition",
         "rtsec",
         "inchikey",
-        "cpd_iter",
+        "CpdIndex",
         "rtmin"
       ) %in% names(temp_cpd)
     )
@@ -57,7 +57,7 @@ test_that("Spec2Xtract::fun_check_cpd", {
   expect_true(temp_cpd[, all(is.numeric(rtmin))])
   expect_true(temp_cpd[, all(is.character(compound))])
   expect_true(temp_cpd[, all(is.character(elemcomposition))])
-  expect_true(temp_cpd[, all(is.integer(cpd_iter))])
+  expect_true(temp_cpd[, all(is.integer(CpdIndex))])
   ## Error
   expect_error(
     Spec2Xtract::fun_check_cpd(
@@ -122,8 +122,8 @@ test_that("Spec2Xtract::init_object", {
   expect_true(length(temp_init$cpd) == nrow(Spec2Xtract:::example_cpdlist_realdt))
   expect_true("cpd_info" %in% names(temp_init$cpd[[1]]))
   expect_true(is.data.table(temp_init$cpd[[1]]$cpd_info))
-  expect_true(temp_init$cpd[[1]]$cpd_info$cpd_iter == 1)
-  expect_true(temp_init$cpd[[2]]$cpd_info$cpd_iter == 2)
+  expect_true(temp_init$cpd[[1]]$cpd_info$CpdIndex == 1)
+  expect_true(temp_init$cpd[[2]]$cpd_info$CpdIndex == 2)
   expect_true("cpdCheck" %in% names(temp_init$cpd[[2]]$cpd_info))
   expect_true(temp_init$cpd[[2]]$cpd_info$cpdCheck == TRUE)
   ## Error file

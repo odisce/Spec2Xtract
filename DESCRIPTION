@@ -1,6 +1,6 @@
 Package: Spec2Xtract
 Title: Extract MS2 spectra from LC-MS
-Version: 0.3
+Version: 0.4
 Authors@R: 
     c(
       person(given = "Sylvain", family = "Dechaumet", email = "sylvain.dechaumet@cea.fr", role = c("aut", "cre")),
@@ -23,7 +23,12 @@ biocViews:
 Imports: 
     Biobase,
     BiocGenerics,
+    crew,
     data.table,
+    dplyr,
+    ggplot2,
+    ggpubr,
+    igraph,
     lifecycle,
     magrittr,
     MassSpecWavelet,
@@ -31,7 +36,9 @@ Imports:
     openxlsx,
     rawrr (>= 1.10),
     Spec2Annot,
-    stringr
+    stringr,
+    tarchetypes,
+    targets
 Suggests: 
     testthat (>= 3.0.0),
     covr,

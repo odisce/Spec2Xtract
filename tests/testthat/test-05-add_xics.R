@@ -24,7 +24,7 @@ test_that("Spec2Xtract::add_xics", {
         "rt",
         "i",
         "type",
-        "MSEvent_index",
+        "EventIndex",
         "FileIndex"
       ) %in%
         names(temp$cpd[[1]]$XICs)

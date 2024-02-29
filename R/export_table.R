@@ -24,10 +24,11 @@ get_summary <- function(annobject) {
     # MS2 Events
     if (
       is.null(
-        annobject$cpd[[cpd_ind]]$MSspectra$scan_info) ||
-          nrow(
-            annobject$cpd[[cpd_ind]]$MSspectra$scan_info[msLevel > 1]
-          ) == 0
+        annobject$cpd[[cpd_ind]]$MSspectra$scan_info
+      ) ||
+        nrow(
+          annobject$cpd[[cpd_ind]]$MSspectra$scan_info[msLevel > 1]
+        ) == 0
     ) {
       ms2events <- 0
     } else {
@@ -107,7 +108,7 @@ get_event_summary <- function(annobject) {
       spec_scans <- spec_to_get[spec_rowi, ]
       speci <- spec_scans[, SpectrumIndex]
       out_i <- annobject$cpd[[cpdi]]$MSspectra$spectra[[speci]]$spectra_info_dt
-      out_i <- cbind(annobject$cpd[[cpdi]]$cpd_info, out_i)
+      out_i <- cbind(annobject$cpd[[cpdi]]$cpd_info, out_i[, -c("CpdIndex", "rtsec", "rtmin")])
       out_i[
         ,
         FileName := annobject$file$info[spec_scans[, FileIndex], file_name]
@@ -166,7 +167,7 @@ export_spectrum_table <- function(annobject, save_dir) {
           ) {
             event_to_get <- annobject$cpd[[
               cpdi
-            ]]$MSspectra$scan_info[msLevel > 1,]
+            ]]$MSspectra$scan_info[msLevel > 1, ]
             for (speci in seq_len(nrow(event_to_get))) {
               save_file <- event_to_get[
                 speci,

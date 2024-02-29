@@ -1,7 +1,7 @@
 #' Get events
 #'
 #' @param pk_best data.table with details on the best peak
-#' @inheritParams get_peak_scores
+#' @inheritParams get_peak_scores_mult
 #' @inheritParams get_events_types
 #'
 #' @return
@@ -10,21 +10,21 @@
 #' @export
 #'
 get_events_scans <- function(cpd_events, pk_best, index_table) {
-  if (!"cpd_iter" %in% names(cpd_events)) {
+  if (!"CpdIndex" %in% names(cpd_events)) {
     if (
-      ("cpd_iter" %in% names(pk_best)) &&
-        (pk_best[, length(unique(cpd_iter))] == 1)
+      ("CpdIndex" %in% names(pk_best)) &&
+        (pk_best[, length(unique(CpdIndex))] == 1)
     ) {
-      cpd_events[, cpd_iter := pk_best[, unique(cpd_iter)]]
+      cpd_events[, CpdIndex := pk_best[, unique(CpdIndex)]]
     } else {
-      cpd_events[, cpd_iter := 1]
-      pk_best[, cpd_iter := 1]
+      cpd_events[, CpdIndex := 1]
+      pk_best[, CpdIndex := 1]
     }
   }
 
   output <-  cpd_events[, {
-    cpd_iter_i <- unique(cpd_iter)
-    pk_info <- pk_best[cpd_iter == cpd_iter_i, ]
+    CpdIndex_i <- unique(CpdIndex)
+    pk_info <- pk_best[CpdIndex == CpdIndex_i, ]
     sub_dt <- .SD[
       ,
       .(
@@ -78,7 +78,7 @@ get_events_scans <- function(cpd_events, pk_best, index_table) {
       rtmin = as.numeric(StartTime),
       masterScan = as.integer(masterScan)
     )]
-  }, by = .(cpd_iter)]
+  }, by = .(CpdIndex)]
   return(output)
 }
 
@@ -111,9 +111,9 @@ add_events_to_extract <- function(annobject, debug = FALSE) {
       }
       event_to_extract_dt <- get_events_scans(
         cpd_events = annobject$file$MSEvents[[filei]][
-          MSEvent_index %in%
+          EventIndex %in%
             annobject$cpd[[i]]$MSEvents[
-              FileIndex == filei, MSEvent_index
+              FileIndex == filei, EventIndex
             ]
         ],
         pk_best = annobject$cpd[[i]]$Peaks[FileIndex == filei],

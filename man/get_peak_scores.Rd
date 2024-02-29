@@ -4,25 +4,21 @@
 \alias{get_peak_scores}
 \title{Calculate peak scores}
 \usage{
-get_peak_scores(xic_peaks, cpd_events, cpd_iter = NULL, cpd_info)
+get_peak_scores(peaks_dt, ref_rtmin = NULL)
 }
 \arguments{
-\item{xic_peaks}{Peak list as returned by
-\code{Spec2Xtract::get_peaks_from_cpdsXIC()}}
+\item{peaks_dt}{Peak list as returned by
+\code{Spec2Xtract::get_peaks_from_xic()}}
 
-\item{cpd_events}{Compound MS(n) event slot}
-
-\item{cpd_iter}{(optional) Compound iteration ID to use}
-
-\item{cpd_info}{Compound Info slot}
+\item{ref_rtmin}{reference rt in minute}
 }
 \value{
-The \code{xic_peaks} data.table with a new columns:
+A data.table identical to \code{peaks_dt} with the following
+supplementary columns:
 \itemize{
-\item \code{peak_score}: Overall scoring of the peaks
-\item \code{peak_in_range}: Number of peaks in range
-\item \code{peaks_mslevels}: MS(n) level of the peak
-\item \code{diff_from_ref}: Time difference from reference
+\item \code{peak_in_range}: Number of peaks in range for this MS Event
+\item \code{diff_from_ref}: RT shift from reference
+\item \code{peak_score}: Final score
 }
 }
 \description{

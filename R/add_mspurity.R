@@ -1,8 +1,9 @@
 #' Title
 #'
 #' @param spectrum_ms spectrum in data.table format with `mz` and `i`
-#' @param msn_info details of the spectrum
-#' @param cpd_info details of the compound (`mz_neg`, `mz_pos`)
+#' @param msn_info details of the spectrum with `spec_isowin`,
+#'                 `spec_precmz` and `spec_polarity` columns
+#' @param cpd_info details of the compound with `mz_neg` and `mz_pos`
 #' @param prec_ppm mass tolerance to search the precursor (in ppm)
 #' @importFrom Spec2Annot mz_range
 #'
@@ -33,7 +34,12 @@ getpurity_from_spectrum <- function(
   ][
     which.min(abs(mz - cpd_mz)), .(mz, i)
   ]
-  isowin_purity <- prec_dt$i / spectrum_ms_iso[, sum(i)] * 100
+  if (nrow(prec_dt) <= 0) {
+    preci <- 0
+  } else {
+    preci <- prec_dt$i
+  }
+  isowin_purity <- preci / spectrum_ms_iso[, sum(i)] * 100
   return(isowin_purity)
 }
 
@@ -101,7 +107,7 @@ add_mspurity <- function(annobject, debug = FALSE) {
           si <- ms_index$SpectrumIndex
 
           isopurity_val <- getpurity_from_spectrum(
-            spectrum_ms = annobject$cpd[[i]]$MSspectra$spectra[[si]]$spectra_db,
+            spectrum_ms = annobject$cpd[[i]]$MSspectra$spectra[[si]]$spectra_db[[1]],
             msn_info = msms_info,
             cpd_info = annobject$cpd[[i]]$cpd_info,
             prec_ppm = 10

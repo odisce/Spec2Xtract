@@ -9,9 +9,10 @@ getpurity_from_spectrum(spectrum_ms, msn_info, cpd_info, prec_ppm = 10)
 \arguments{
 \item{spectrum_ms}{spectrum in data.table format with \code{mz} and \code{i}}
 
-\item{msn_info}{details of the spectrum}
+\item{msn_info}{details of the spectrum with \code{spec_isowin},
+\code{spec_precmz} and \code{spec_polarity} columns}
 
-\item{cpd_info}{details of the compound (\code{mz_neg}, \code{mz_pos})}
+\item{cpd_info}{details of the compound with \code{mz_neg} and \code{mz_pos}}
 
 \item{prec_ppm}{mass tolerance to search the precursor (in ppm)}
 }

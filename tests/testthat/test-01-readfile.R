@@ -1,3 +1,37 @@
+test_that(
+  "load_files: existing file", {
+    tempa <- load_files(files = rawrr::sampleFilePath())
+    expect_true(is.data.table(tempa))
+    expect_true(nrow(tempa) == 1)
+    expect_true(
+      all(
+        c("file_path", "file_name", "FileIndex", "FileExist") %in% names(tempa)
+      )
+    )
+    expect_true(tempa$FileExist)
+    expect_true(!any(duplicated(tempa$FileIndex)))
+    expect_true(tempa$file_path == rawrr::sampleFilePath())
+  }
+)
+
+test_that(
+  "load_files: non-existant file", {
+    temp_path <- "/test/ta/ezf/sqdf/qsfz.eztsqfd"
+    tempa <- load_files(files = temp_path)
+    expect_true(is.data.table(tempa))
+    expect_true(nrow(tempa) == 1)
+    expect_true(
+      all(
+        c("file_path", "file_name", "FileIndex", "FileExist") %in% names(tempa)
+      )
+    )
+    expect_false(tempa$FileExist)
+    expect_true(!any(duplicated(tempa$FileIndex)))
+    expect_true(tempa$file_path == temp_path)
+  }
+)
+
+
 test_that("Spec2Xtract::check_rawfile: .raw", {
   testthat::expect_true(
     Spec2Xtract::check_rawfile(

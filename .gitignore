@@ -1,3 +1,4 @@
 .devcontainer/
 .Rprofile
 .RData
+*_DEV*

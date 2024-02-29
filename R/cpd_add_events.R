@@ -29,7 +29,7 @@ cpd_add_events <- function(
 
       if (isTRUE(indexonly)) {
         ms_events_dt_iter <- rbind(
-          ms_events_dt[spec_polarity == x & msLevel == 1, .(MSEvent_index)],
+          ms_events_dt[spec_polarity == x & msLevel == 1, .(EventIndex)],
           ms_events_dt[
             spec_polarity == x &
               msLevel > 1 &
@@ -37,7 +37,7 @@ cpd_add_events <- function(
                 (spec_prec - (0.7 * isolation_window)) <= mz_range[1] &
                   (spec_prec + (0.7 * isolation_window)) >= mz_range[2]
               ),
-            .(MSEvent_index)
+            .(EventIndex)
           ]
         )
       } else {
@@ -95,7 +95,7 @@ add_cpd_events <- function(annobject, prec_ppm = 10) {
               prec_ppm = prec_ppm,
               indexonly = TRUE
             ) %>% {
-              .[, .(FileIndex = x, MSEvent_index)]
+              .[, .(FileIndex = x, EventIndex)]
             }
           }
         }

@@ -1,3 +1,4 @@
+testthat::skip("Old implementation, check: target_x.R")
 file_path <- tryCatch(
   {
     url_sample <- "https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS20/391_3-Hydroxy-4-methoxycinnamic_acid_NEG.RAW"
@@ -33,7 +34,7 @@ testthat::test_that("Real data", {
     firstevent = TRUE,
     prec_ppm = 10,
     ms1 = TRUE,
-    rt_limit = 1,
+    rt_limit = 2,
     ppm = 5,
     save_dir = save_dir,
     debug = FALSE

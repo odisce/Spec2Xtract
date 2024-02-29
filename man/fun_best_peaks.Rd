@@ -10,7 +10,7 @@ fun_best_peaks(pk_scores)
 \item{pk_scores}{A data.table containing peaks info and scores}
 }
 \value{
-A data.table containing the only best peaks for each \code{cpd_iter}
+A data.table containing the only best peaks for each \code{CpdIndex}
 based on the maximum of \code{peak_score} column
 }
 \description{

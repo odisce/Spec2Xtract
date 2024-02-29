@@ -1,3 +1,34 @@
+#' Download sample raw file in temporary directory
+#'
+#' Download a sample .RAW file from metabolights.
+#' Used for testing purposed and some examples.
+#'
+#' @return
+#' If the file can be downloaded, return the path to the file
+#' on the current disk. If the file is unavailable, then
+#' return `FALSE`
+#' @examples
+#' get_sample_rawfile()
+#' @importFrom utils download.file
+#' @export
+get_sample_rawfile <- function() {
+  tryCatch({
+    url_sample <- "https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS20/391_3-Hydroxy-4-methoxycinnamic_acid_NEG.RAW"
+    temp_dir <- tempdir()
+    temp_file <- file.path(temp_dir, "test.raw")
+    download.file(url = url_sample, destfile = temp_file)
+    if (file.exists(temp_file)) {
+      return(temp_file)
+    } else {
+      return(FALSE)
+    }
+  },
+  error = function(e) {
+    print(e)
+    return(FALSE)
+  })
+}
+
 #' Get .raw index as data.table
 #'
 #' @inheritParams check_rawfile
@@ -129,12 +160,17 @@ fun_check_cpd <- function(cpd) {
     inchikey <- as.character(NA)
   }
   ## format file
-  x[, cpd_iter := seq_len(.N)]
+  x[, CpdIndex := seq_len(.N)] ## TODEL
+  x[, CpdIndex := seq_len(.N)]
   x[, compound := as.character(compound)]
   x[, rtsec := as.numeric(rtsec)]
   x[, rtmin := rtsec / 60]
   x[, inchikey := as.character(inchikey)]
-  x[, elemcomposition := as.character(elemcomposition) %>% stringr::str_trim()]
+  x[
+    ,
+    elemcomposition := as.character(elemcomposition) %>%
+      stringr::str_trim()
+  ]
   return(x[])
 }
 
@@ -160,9 +196,38 @@ cpd_add_ionsmass <- function(cpd) {
       mz_pos = mz_pos,
       mz_neg = mz_neg
     )
-  }, by = cpd_iter]
-  merge(cpd, temp, by = "cpd_iter") %>%
+  }, by = CpdIndex]
+  merge(cpd, temp, by = "CpdIndex") %>%
     return()
+}
+
+#' Create data.table from files path
+#'
+#' Description
+#'
+#' @param files Vector of path(s) to `.raw` files
+#' @import data.table magrittr
+#' @return Details on returned object.
+#' @examples
+#' load_files(files = rawrr::sampleFilePath())
+#' @export
+#'
+load_files <- function(files) {
+  temp <- data.table(
+        file_path = files,
+        file_name = files %>%
+          basename(.) %>%
+          tools::file_path_sans_ext(.)
+      )
+  ## Add IDs
+  temp[, FileIndex := 1:.N]
+
+  ## Check if file exists
+  temp[, FileExist := {
+    file.exists(file_path)
+  }, by = FileIndex]
+  
+  return(temp[])
 }
 
 #' Initialize object to store results

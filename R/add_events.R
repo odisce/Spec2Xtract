@@ -104,7 +104,7 @@ add_events <- function(
         raw_path = annobject$file$info[i, file_path],
         firstevent = firstevent
       )
-      output[, MSEvent_index := seq_len(.N)]
+      output[, EventIndex := seq_len(.N)]
       annobject$file$MSEvents[[i]] <- output[]
       ## Add info in fileinfo
       annobject$file$info[i,

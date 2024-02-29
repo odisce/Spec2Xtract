@@ -30,7 +30,7 @@ add_annot <- function(annobject, ppm = 5) {
         msms_index <- msn_scan_dt[scan_i, SpectrumIndex]
         msms_spectrum <- annobject$cpd[[
           i
-        ]]$MSspectra$spectra[[msms_index]]$spectra_db[, .(mz, i)]
+        ]]$MSspectra$spectra[[msms_index]]$spectra_db[[1]][, .(mz, i)]
 
         cpd_compo <- annobject$cpd[[i]]$cpd_info$elemcomposition
         spec_annot <- Spec2Annot::annotate_mz(

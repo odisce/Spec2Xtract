@@ -177,48 +177,48 @@ add_xics <- function(
         ) {
           return(NULL)
         } else {
-        cpd_events_i <- merge(
-          annobject$cpd[[i]]$MSEvents[FileIndex == file_i],
-          annobject$file$MSEvents[[file_i]],
-          by = "MSEvent_index"
-        )
-        if (isTRUE(ms1) & cpd_events_i[, any(msLevel == 1)]) {
-          cpd_events_i <- cpd_events_i[msLevel == 1, ]
-        }
-        ## For each events
-        events_max <- nrow(cpd_events_i)
-        file_xics <- lapply(
-          seq_len(events_max),
-          function(events_i) {
-            if (isTRUE(debug)) {
-              message("E", events_i, appendLF = FALSE)
-              if (events_i < events_max) {
-                message("-", appendLF = FALSE)
-              }
-            }
-            cpd_events_ii <- cpd_events_i[events_i, ]
-            temp_xic <- fun_get_xics(
-              rawpath = annobject$file$info[file_i, file_path],
-              mz = cpd_events_ii[,
-                ifelse(
-                  spec_polarity == 0,
-                  annobject$cpd[[i]]$cpd_info$mz_neg,
-                  annobject$cpd[[i]]$cpd_info$mz_pos
-                )
-              ],
-              ppm = 10,
-              mslevel = cpd_events_ii[, msLevel],
-              isomz = cpd_events_ii[, scanType],
-              index_table = annobject$file$index[[file_i]],
-              type = "xic"
-            )
-            temp_xic[, MSEvent_index := cpd_events_ii[, MSEvent_index]]
-            return(temp_xic[, .(ppm, rt, i, type, MSEvent_index)])
+          cpd_events_i <- merge(
+            annobject$cpd[[i]]$MSEvents[FileIndex == file_i],
+            annobject$file$MSEvents[[file_i]],
+            by = "EventIndex"
+          )
+          if (isTRUE(ms1) & cpd_events_i[, any(msLevel == 1)]) {
+            cpd_events_i <- cpd_events_i[msLevel == 1, ]
           }
-        ) %>%
-          rbindlist()
-        file_xics[, FileIndex := file_i]
-        return(file_xics[])
+          ## For each events
+          events_max <- nrow(cpd_events_i)
+          file_xics <- lapply(
+            seq_len(events_max),
+            function(events_i) {
+              if (isTRUE(debug)) {
+                message("E", events_i, appendLF = FALSE)
+                if (events_i < events_max) {
+                  message("-", appendLF = FALSE)
+                }
+              }
+              cpd_events_ii <- cpd_events_i[events_i, ]
+              temp_xic <- fun_get_xics(
+                rawpath = annobject$file$info[file_i, file_path],
+                mz = cpd_events_ii[,
+                  ifelse(
+                    spec_polarity == 0,
+                    annobject$cpd[[i]]$cpd_info$mz_neg,
+                    annobject$cpd[[i]]$cpd_info$mz_pos
+                  )
+                ],
+                ppm = 10,
+                mslevel = cpd_events_ii[, msLevel],
+                isomz = cpd_events_ii[, scanType],
+                index_table = annobject$file$index[[file_i]],
+                type = "xic"
+              )
+              temp_xic[, EventIndex := cpd_events_ii[, EventIndex]]
+              return(temp_xic[, .(ppm, rt, i, type, EventIndex)])
+            }
+          ) %>%
+            rbindlist()
+          file_xics[, FileIndex := file_i]
+          return(file_xics[])
         }
       }
     ) %>%

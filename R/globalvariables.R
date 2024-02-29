@@ -1,16 +1,18 @@
 globalVariables(
   c(
     ".",
+    "..col_to_add",
     "col_info",
     "compound",
     "cpd_index",
-    "cpd_iter",
+    "CpdIndex",
     "cpdCheck",
     "diff_from_ref",
     "elemcomposition",
     "file_path",
     "file_path",
     "FileCheck",
+    "FileExist",
     "FileIndex",
     "FileName",
     "FileNb",
@@ -27,8 +29,9 @@ globalVariables(
     "isolation_window",
     "IsoPurity",
     "IsoPurity_mean",
+    "iterPeaks",
     "masterScan",
-    "MSEvent_index",
+    "EventIndex",
     "MSEvent_nb",
     "mslevel",
     "msLevel",
@@ -60,6 +63,7 @@ globalVariables(
     "spec_energy",
     "spec_polarity",
     "spec_prec",
+    "spec_scan",
     "SpectrumIndex",
     "spectrum_name",
     "StartTime",
@@ -67,4 +71,3 @@ globalVariables(
     "zigzag_score"
   )
 )
-

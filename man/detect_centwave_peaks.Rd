@@ -4,7 +4,13 @@
 \alias{detect_centwave_peaks}
 \title{Use MassSpecWavelet to detect peaks}
 \usage{
-detect_centwave_peaks(vecint, snrth = 3, majpeakonly = TRUE, ...)
+detect_centwave_peaks(
+  vecint,
+  snrth = 3,
+  majpeakonly = TRUE,
+  limits = c("xic", "scales")[2],
+  ...
+)
 }
 \arguments{
 \item{vecint}{Numeric vector containing the intensities
@@ -15,6 +21,9 @@ sorted by the time dimension.}
 
 \item{majpeakonly}{Logical to extract only the majors peaks (\code{TRUE})
 or all peaks (\code{FALSE}) from MassSpecWavelet}
+
+\item{limits}{Should peak boundaries be found on true data (\code{xic}) or
+on CentWave scales (\code{scales}: default)?}
 
 \item{...}{Other options passed to \code{MassSpecWavelet::peakDetectionCWT()}}
 }

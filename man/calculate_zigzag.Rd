@@ -2,7 +2,7 @@
 % Please edit documentation in R/add_best_peaks.R
 \name{calculate_zigzag}
 \alias{calculate_zigzag}
-\title{Title}
+\title{Calculate the zig-zag score of a vector}
 \source{
 \url{https://github.com/GauravPandeyLab/MetaClean/blob/master/R/calculateZigZagIndex.R}
 }
@@ -17,7 +17,7 @@ sorted by the time dimension.}
 The zig-zag index value
 }
 \description{
-Title
+Calculate the zig-zag score of a vector
 }
 \examples{
 calculate_zigzag(rnorm(100, 1e5, sd = 1e3))
