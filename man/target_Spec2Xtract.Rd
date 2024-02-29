@@ -37,9 +37,7 @@ inside a peak to keep it}
 search in ppm}
 }
 \value{
-A list of targets objects. Using targets is out of the
-scope of this package, to understand what you can do with it
-please read the \link[=https://github.com/ropensci/targets]{targets documentation}.
+A list of targets objects.
 }
 \description{
 targets factory to extract MS2 spectra

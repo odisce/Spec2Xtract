@@ -10,9 +10,7 @@
 #' @inheritParams add_mspurity
 #' @inheritParams add_annot
 #' @inheritParams export_tables
-#' @return A list of targets objects. Using targets is out of the
-#' scope of this package, to understand what you can do with it
-#' please read the [targets documentation][https://github.com/ropensci/targets].
+#' @return A list of targets objects.
 #' @import targets tarchetypes data.table magrittr ggplot2 ggpubr dplyr
 #' @export
 #' @examples
