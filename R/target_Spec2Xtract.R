@@ -964,7 +964,8 @@ run_Spec2Xtract <- function(
         minscan = eval(minscan),
         rt_limit = eval(rt_limit),
         ppm = eval(ppm),
-        save_dir = eval(save_dir)
+        save_dir = eval(save_dir),
+        ncore = eval(ncore)
       )
     )
   )
