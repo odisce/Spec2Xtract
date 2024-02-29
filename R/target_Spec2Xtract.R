@@ -905,45 +905,56 @@ run_Spec2Xtract <- function(
   save_dir
 ) {
   dir.create(save_dir)
-  targets::tar_script(
-    {
-      library(Spec2Xtract)
-      library(targets)
-      if (!file.exists(cpd_path)) {
-        stop("cpd_path doesn't exist it must be a file")
-      }
-      if (!dir.exists(files_dir)) {
-        stop("files_dir doesn't exist it must be a directory with .raw files")
-      }
+  if (!file.exists(cpd_path)) {
+    stop("cpd_path doesn't exist it must be a file")
+  }
+  if (!dir.exists(files_dir)) {
+    stop("files_dir doesn't exist it must be a directory with .raw files")
+  }
 
-      table_ext <- tools::file_ext(cpd_path)
-
-      if (table_ext == "xlsx") {
-        cpd_dt <- openxlsx::read.xlsx(cpd_path) %>%
-          as.data.table()
-      } else if (table_ext %in% c("csv", "tsv", "txt")) {
-        cpd_dt <- data.table::fread(cpd_path)
-      }
-
-      list(
-        target_Spec2Xtract(
-          files = list.files(
-            files_dir,
-            pattern = "\\.raw$",
-            full.names = TRUE,
-            ignore.case = TRUE
-          ),
-          cpd = cpd_dt,
-          firstevent = firstevent,
-          prec_ppm = prec_ppm,
-          minscan = minscan,
-          rt_limit = rt_limit,
-          ppm = ppm,
-          save_dir = save_dir
+  eval(
+    substitute(
+      {
+        targets::tar_script(
+          {
+            library(Spec2Xtract)
+            library(magrittr)
+            library(data.table)
+            
+            table_ext <- tools::file_ext(cpd_path)       
+            if (table_ext == "xlsx") {
+              cpd_dt <- openxlsx::read.xlsx(cpd_path) %>%
+                data.table::as.data.table()
+            } else if (table_ext %in% c("csv", "tsv", "txt")) {
+              cpd_dt <- data.table::fread(cpd_path)
+            }
+            
+            list(
+              target_Spec2Xtract(
+                files = list.files(
+                  files_dir,
+                  pattern = "\\.raw$",
+                  full.names = TRUE,
+                  ignore.case = TRUE
+                ),
+                cpd = cpd_dt,
+                firstevent = firstevent,
+                prec_ppm = prec_ppm,
+                minscan = minscan,
+                rt_limit = rt_limit,
+                ppm = ppm,
+                save_dir = save_dir
+              )
+            )
+          },
+          ask = FALSE
         )
+      },
+      list(
+        cpd_path = eval(cpd_path),
+        files_dir = eval(files_dir)
       )
-    },
-    ask = FALSE
+    )
   )
   ## Run pipeline
   targets::tar_make()
