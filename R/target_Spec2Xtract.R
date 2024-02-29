@@ -884,3 +884,69 @@ target_Spec2Xtract <- function(
 
   )
 }
+
+#' Wrapper to run targets pipeline
+#' 
+#' This function run a full targets pipeline from
+#' two paths: one to the directory containing .raw
+#' files and one to the compound table.
+#' @param files_dir path to the directory containing the
+#'                  .raw files
+#' @param cpd_path path to the table with compound informations
+#' @inheritParams target_Spec2Xtract
+#' @import targets openxlsx data.table magrittr
+#' @export
+run_Spec2Xtract <- function(
+  files_dir,
+  cpd_path,
+  firstevent,
+  prec_ppm,
+  minscan,
+  rt_limit,
+  ppm,
+  save_dir
+) {
+  dir.create(save_dir)
+  targets::tar_script(
+    {
+      library(Spec2Xtract)
+      library(targets)
+      if (!file.exists(cpd_path)) {
+        stop("cpd_path doesn't exist it must be a file")
+      }
+      if (!dir.exists(files_dir)) {
+        stop("files_dir doesn't exist it must be a directory with .raw files")
+      }
+
+      table_ext <- tools::file_ext(cpd_path)
+
+      if (table_ext == "xlsx") {
+        cpd_dt <- openxlsx::read.xlsx(cpd_path) %>%
+          as.data.table()
+      } else if (table_ext %in% c("csv", "tsv", "txt")) {
+        cpd_dt <- data.table::fread(cpd_path)
+      }
+
+      list(
+        target_Spec2Xtract(
+          files = list.files(
+            files_dir,
+            pattern = "\\.raw$",
+            full.names = TRUE,
+            ignore.case = TRUE
+          ),
+          cpd = cpd_dt,
+          firstevent = firstevent,
+          prec_ppm = prec_ppm,
+          minscan = minscan,
+          rt_limit = rt_limit,
+          ppm = ppm,
+          save_dir = save_dir
+        )
+      )
+    },
+    ask = FALSE
+  )
+  ## Run pipeline
+  targets::tar_make()
+}
