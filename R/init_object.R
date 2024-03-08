@@ -227,19 +227,19 @@ cpd_add_ionsmass <- function(cpd) {
 #'
 load_files <- function(files) {
   temp <- data.table(
-        file_path = files,
-        file_name = files %>%
-          basename(.) %>%
-          tools::file_path_sans_ext(.)
-      )
+    file_path = files,
+    file_name = files %>%
+      basename(.) %>%
+      tools::file_path_sans_ext(.)
+  )
   ## Add IDs
-  temp[, FileIndex := 1:.N]
+  temp[, FileIndex := seq_len(.N)]
 
   ## Check if file exists
   temp[, FileExist := {
     file.exists(file_path)
   }, by = FileIndex]
-  
+
   return(temp[])
 }
 

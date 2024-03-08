@@ -143,12 +143,8 @@ target_Spec2Xtract <- function(
     tar_target_raw(
       "CPD_EVENTS",
       quote({
-        ## Extract XICs for each polarity and MS(n)
-        # F_EVENTS <- tar_read(F_EVENTS, 1)[[1]]
-        # CPD_INFO_dt <- tar_read(CPD_INFO_dt)[1, ]
-        ## Check each event
         temp_dt <- copy(F_EVENTS)
-        temp_dt[, EventIndex := 1:.N]
+        temp_dt[, EventIndex := seq_len(.N)]
         temp_dt[,
           c("CpdEventPrec", "CPDCheck") := {
             prec_check <- FALSE
@@ -195,12 +191,10 @@ target_Spec2Xtract <- function(
           grped_event <- split(output, output$EventIndexUn) %>% {
             lapply(., function(x) {
               grpi_dic_full <- x[, .(EventIndexUn, EventIndex, spec_prec)]
-              
               if (nrow(x) > 1) {
-                # x <- split(output, output$EventIndexUn)[[2]]
                 comp_grid <- combn(seq_len(x[, .N]), 2) %>%
                   t()
-                
+
                 mz_in_range <- lapply(
                   seq_len(nrow(comp_grid)),
                   function(y) {
@@ -229,7 +223,6 @@ target_Spec2Xtract <- function(
                 ) %>%
                   rbindlist()
 
-                
                 if (mz_in_range[diffok == TRUE, .N] >= 1) {
                   grpi_dt <- igraph::graph_from_data_frame(
                     mz_in_range[diffok == TRUE, ]
@@ -242,7 +235,7 @@ target_Spec2Xtract <- function(
                   grpi_dic <- merge(
                     grpi_dt,
                     grpi_dic_full,
-                    by = 'spec_prec',
+                    by = "spec_prec",
                     all.y = TRUE
                   )
                   grp_i_max <- grpi_dic[, max(grpi, na.rm = TRUE)] + 1
@@ -317,15 +310,9 @@ target_Spec2Xtract <- function(
 
     tar_target_raw(
       "CPD_PEAKS", substitute({
-        # CPD_XICs <- tar_read(CPD_XICs, 32)[[1]]
-        # tar_load(CPD_INFO_dt)
-        # CPD_EVENTS <- tar_read(CPD_EVENTS, 32)[[1]]
-        # minscan <- 3
-        # rt_limit <- 0.8
         if (is.null(CPD_XICs)) {
           return(NULL)
         }
-        
         CPD_peaks <- CPD_XICs[
           ,
           {
@@ -404,11 +391,6 @@ target_Spec2Xtract <- function(
     ## Check MSEvent in best peak range
     tar_target_raw(
       "MSEVENT2EXTRACT", quote({
-        # i <- 1
-        # CPD_PEAKS <- tar_read(CPD_PEAKS, i)[[1]]
-        # CPD_EVENTS <- tar_read(CPD_EVENTS, i)[[1]]
-        # tar_load(c(CPD_INFO_dt, F_INDEX))
-
         if (is.null(CPD_PEAKS) || nrow(CPD_PEAKS) <= 0 || CPD_PEAKS[BestPeak == TRUE, .N] <= 0) {
           ## No peaks detected, returning null
           return(NULL)
@@ -475,8 +457,6 @@ target_Spec2Xtract <- function(
     ),
     tar_target_raw(
       "MSSPECTRA", quote({
-        # tar_load(c(F_INFO_dt, MSEVENT2EXTRACT_dt))
-        # MSSPECTRA_ITER <- tar_read(MSSPECTRA_ITER)[[7]]
         file_info_i <- F_INFO_dt[FileIndex == MSSPECTRA_ITER, ]
         scan_to_get_i <- MSEVENT2EXTRACT_dt[FileIndex == MSSPECTRA_ITER, ]
         spectra_db <- get_spectrum_db(
@@ -493,8 +473,6 @@ target_Spec2Xtract <- function(
     ),
     tar_target_raw(
       "MSSPECTRA_COMB", quote({
-        # tar_load(c(F_INFO_dt, MSEVENT2EXTRACT_dt, MSSPECTRA))
-        # MSSPECTRA_ITER <- tar_read(MSSPECTRA_ITER)[[1]]
         spec_info <- data.table()
         spec_list <- list()
         spec_index <- 0
@@ -552,25 +530,28 @@ target_Spec2Xtract <- function(
       "ISOPURITY", substitute({
         # tar_load(c(MSSPECTRA_COMB, CPD_INFO_dt))
         ## Calculate purity on MS1
-        MSSPECTRA_COMB$spectra_info_dt[msLevel == 2, "isopurity" := {
-          # .N
-          ## Check if MS1 available
-          temp_i <- .SD[, .(FileIndex, CpdIndex, spec_polarity)] %>% unique()
-          temp_events <- MSSPECTRA_COMB$spectra_info_dt[temp_i, on = c("FileIndex", "CpdIndex", "spec_polarity")][msLevel == 1, ]
-          iso_purity_val <- as.numeric(NA)
-          if (nrow(temp_events) > 0) {
-            ## Select one of the MS1 spectra
-            CpdIndex_i <- unique(CpdIndex)
-            SpectrumIndex_i <- unique(SpectrumIndex)
-            iso_purity_val <- getpurity_from_spectrum(
-              spectrum_ms = MSSPECTRA_COMB$spectra_db[[SpectrumIndex_i]],
-              msn_info = .SD[, .(spec_polarity, spec_precmz, spec_isowin)],
-              cpd_info = CPD_INFO_dt[CpdIndex == CpdIndex_i, .(mz_pos, mz_neg)],
-              prec_ppm = prec_ppm
-            )
-          }
-          iso_purity_val
-        }, by = .(FileIndex, CpdIndex, spec_scan, SpectrumIndex)]
+        MSSPECTRA_COMB$spectra_info_dt[
+          msLevel == 2,
+          "isopurity" := {
+            ## Check if MS1 available
+            temp_i <- .SD[, .(FileIndex, CpdIndex, spec_polarity)] %>% unique()
+            temp_events <- MSSPECTRA_COMB$spectra_info_dt[temp_i, on = c("FileIndex", "CpdIndex", "spec_polarity")][msLevel == 1, ]
+            iso_purity_val <- as.numeric(NA)
+            if (nrow(temp_events) > 0) {
+              ## Select one of the MS1 spectra
+              CpdIndex_i <- unique(CpdIndex)
+              SpectrumIndex_i <- unique(SpectrumIndex)
+              iso_purity_val <- getpurity_from_spectrum(
+                spectrum_ms = MSSPECTRA_COMB$spectra_db[[SpectrumIndex_i]],
+                msn_info = .SD[, .(spec_polarity, spec_precmz, spec_isowin)],
+                cpd_info = CPD_INFO_dt[CpdIndex == CpdIndex_i, .(mz_pos, mz_neg)],
+                prec_ppm = prec_ppm
+              )
+            }
+            iso_purity_val
+          },
+          by = .(FileIndex, CpdIndex, spec_scan, SpectrumIndex)
+        ]
         return(MSSPECTRA_COMB)
       }),
       deployment = "main",
@@ -587,7 +568,6 @@ target_Spec2Xtract <- function(
     ),
     tar_target_raw(
       "ANNOT", substitute({
-        # tar_load(c(ISOPURITY, CPD_INFO_dt)) ; ppm <- 5
         ## Add annotation to a different layer if multiple cpd for the same spectrum
         spec_info_i <- ISOPURITY$spectra_info_dt[iter == ANNOT_ITER, ]
         cpd_info_i <- CPD_INFO_dt[CpdIndex == spec_info_i$CpdIndex, ]
@@ -617,7 +597,6 @@ target_Spec2Xtract <- function(
     ## Make plots by compound
     tar_target_raw(
       "XIC_data", quote({
-        # tar_load(c(CPD_XICs, CPD_PEAKS, ISOPURITY))
         rbindlist(CPD_XICs) %>%
           dplyr::group_by(., CpdIndex) %>%
           targets::tar_group()
@@ -648,8 +627,6 @@ target_Spec2Xtract <- function(
     ),
     tar_target_raw(
       "XIC_ggplot", quote({
-        # XIC_data <- tar_read(XIC_data) %>% dplyr::filter(., tar_group == 2)
-        # tar_load(c(PEAK_dt, ISOPURITY))
         xic_dt <- as.data.table(XIC_data)
         peakdt_i <- PEAK_dt[CpdIndex == xic_dt[, unique(CpdIndex)]]
         if (nrow(peakdt_i) <= 0) {
@@ -658,9 +635,7 @@ target_Spec2Xtract <- function(
         }
 
         ## Get peaks trace
-        # peakdt_i <- peaks_full[CpdIndex == 1,]
         peakdt_i[, peakID := paste0("PK", seq_len(.N))]
-
         peak_xic <- peakdt_i[, {
           temp_i <- .SD[, .(CpdIndex, FileIndex)]
           rt_range <- c(rtmin, rtmax)
@@ -761,7 +736,7 @@ target_Spec2Xtract <- function(
         )
         return(output)
       }),
-      deployment = 'main',
+      deployment = "main",
       packages = c("data.table", "magrittr")
     ),
 
@@ -793,7 +768,7 @@ target_Spec2Xtract <- function(
 
         return(output)
       }),
-      deployment = 'main',
+      deployment = "main",
       packages = c("data.table", "magrittr")
     ),
 
@@ -844,7 +819,7 @@ target_Spec2Xtract <- function(
             } else {
               spec_out <- temp_sp
             }
-            spec_out[, irel := i/max(i)]
+            spec_out[, irel := i / max(i)]
             new_colorder <- c("mz", "i", "irel", "formula", "ppm")
             new_colorder <- intersect(new_colorder, names(spec_out))
             setcolorder(spec_out, new_colorder)
@@ -872,7 +847,9 @@ target_Spec2Xtract <- function(
         } else {
           ## Create folder
           save_dir_xics <- file.path(save_dir, "figures", "xics")
-          if (!dir.exists(save_dir_xics)) {dir.create(save_dir_xics, recursive = TRUE)}
+          if (!dir.exists(save_dir_xics)) {
+            dir.create(save_dir_xics, recursive = TRUE)
+          }
           ## Add names
           cpd_index_i <- as.data.table(XIC_data)[, unique(CpdIndex)]
           save_path <- file.path(save_dir_xics, paste0("CPD", cpd_index_i, ".png"))
@@ -895,7 +872,7 @@ target_Spec2Xtract <- function(
 }
 
 #' Wrapper to run targets pipeline
-#' 
+#'
 #' This function run a full targets pipeline from
 #' two paths: one to the directory containing .raw
 #' files and one to the compound table.
@@ -927,13 +904,13 @@ run_Spec2Xtract <- function(
   if (!dir.exists(files_dir)) {
     stop("files_dir doesn't exist it must be a directory with .raw files")
   }
-  
+
   eval(
     substitute(
       {
         targets::tar_script(
           {
-            table_ext <- tools::file_ext(cpd_path)       
+            table_ext <- tools::file_ext(cpd_path)
             if (table_ext == "xlsx") {
               cpd_in <- openxlsx::read.xlsx(cpd_path)
               cpd_dt <- data.table::as.data.table(cpd_in)
