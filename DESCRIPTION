@@ -1,6 +1,6 @@
 Package: Spec2Xtract
 Title: Extract MS2 spectra from LC-MS
-Version: 0.6
+Version: 0.7
 Authors@R: 
     c(
       person(given = "Sylvain", family = "Dechaumet", email = "sylvain.dechaumet@cea.fr", role = c("aut", "cre")),
