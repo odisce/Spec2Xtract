@@ -77,7 +77,7 @@
     "BiocParallel": {
       "Package": "BiocParallel",
       "Version": "1.36.0",
-      "Source": "Repository",
+      "Source": "Bioconductor",
       "Requirements": [
         "BH",
         "R",
@@ -104,7 +104,7 @@
     "IRanges": {
       "Package": "IRanges",
       "Version": "2.36.0",
-      "Source": "Repository",
+      "Source": "Bioconductor",
       "Requirements": [
         "BiocGenerics",
         "R",
@@ -146,7 +146,7 @@
     "MSnbase": {
       "Package": "MSnbase",
       "Version": "2.28.1",
-      "Source": "Repository",
+      "Source": "Bioconductor",
       "Requirements": [
         "Biobase",
         "BiocGenerics",
@@ -216,7 +216,7 @@
     "MsCoreUtils": {
       "Package": "MsCoreUtils",
       "Version": "1.14.1",
-      "Source": "Repository",
+      "Source": "Bioconductor",
       "Requirements": [
         "MASS",
         "R",
@@ -294,6 +294,7 @@
       "Package": "S4Vectors",
       "Version": "0.38.2",
       "Source": "Repository",
+      "Repository": "https://bioconductor.org/packages/3.17/bioc",
       "Requirements": [
         "BiocGenerics",
         "R",
@@ -364,7 +365,7 @@
     "affy": {
       "Package": "affy",
       "Version": "1.80.0",
-      "Source": "Repository",
+      "Source": "Bioconductor",
       "Requirements": [
         "Biobase",
         "BiocGenerics",
@@ -385,6 +386,7 @@
       "Package": "affyio",
       "Version": "1.70.0",
       "Source": "Repository",
+      "Repository": "https://bioconductor.org/packages/3.17/bioc",
       "Requirements": [
         "R",
         "methods",
@@ -767,7 +769,7 @@
       "Package": "fastmap",
       "Version": "1.1.1",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "https://p3m.dev/cran/__linux__/jammy/latest",
       "Hash": "f7736a18de97dea803bde0a2daaafb27"
     },
     "foreach": {
@@ -1018,7 +1020,7 @@
     "impute": {
       "Package": "impute",
       "Version": "1.76.0",
-      "Source": "Repository",
+      "Source": "Bioconductor",
       "Requirements": [
         "R"
       ],
@@ -1098,7 +1100,7 @@
       "Package": "later",
       "Version": "1.3.1",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "https://p3m.dev/cran/__linux__/jammy/latest",
       "Requirements": [
         "Rcpp",
         "rlang"
@@ -1137,6 +1139,7 @@
       "Package": "limma",
       "Version": "3.56.2",
       "Source": "Repository",
+      "Repository": "https://bioconductor.org/packages/3.17/bioc",
       "Requirements": [
         "R",
         "grDevices",
@@ -1235,7 +1238,7 @@
     "mzID": {
       "Package": "mzID",
       "Version": "1.40.0",
-      "Source": "Repository",
+      "Source": "Bioconductor",
       "Requirements": [
         "ProtGenerics",
         "XML",
@@ -1366,7 +1369,7 @@
     "pcaMethods": {
       "Package": "pcaMethods",
       "Version": "1.94.0",
-      "Source": "Repository",
+      "Source": "Bioconductor",
       "Requirements": [
         "Biobase",
         "BiocGenerics",
@@ -1474,7 +1477,7 @@
     "preprocessCore": {
       "Package": "preprocessCore",
       "Version": "1.64.0",
-      "Source": "Repository",
+      "Source": "Bioconductor",
       "Requirements": [
         "stats"
       ],
@@ -1507,7 +1510,7 @@
       "Package": "promises",
       "Version": "1.2.1",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "https://p3m.dev/cran/__linux__/jammy/latest",
       "Requirements": [
         "R6",
         "Rcpp",
@@ -1588,13 +1591,13 @@
     },
     "renv": {
       "Package": "renv",
-      "Version": "1.0.3",
+      "Version": "1.0.5",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "CRAN",
       "Requirements": [
         "utils"
       ],
-      "Hash": "41b847654f567341725473431dd0d5ab"
+      "Hash": "32c3f93e8360f667ca5863272ec8ba6a"
     },
     "rlang": {
       "Package": "rlang",
@@ -1901,7 +1904,7 @@
     "vsn": {
       "Package": "vsn",
       "Version": "3.70.0",
-      "Source": "Repository",
+      "Source": "Bioconductor",
       "Requirements": [
         "Biobase",
         "R",
@@ -1972,7 +1975,7 @@
     "zlibbioc": {
       "Package": "zlibbioc",
       "Version": "1.48.0",
-      "Source": "Repository",
+      "Source": "Bioconductor",
       "Hash": "50ad6f7b0baaaccf1a387d2f1ecce911"
     }
   }
