@@ -23,25 +23,6 @@ get_sample_rawfile <- function() {
         package = "Spec2Xtract"
       )
     )
-  } else if (
-    requireNamespace("testthat") &&
-      file.exists(
-        file.path(
-          testthat::test_path(),
-          "testdata",
-          "samplefile.raw"
-        )
-      )
-  ) {
-    return(
-      file.exists(
-        file.path(
-          testthat::test_path(),
-          "testdata",
-          "samplefile.raw"
-        )
-      )
-    )
   } else {
     tryCatch({
       url_sample <- "https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS20/391_3-Hydroxy-4-methoxycinnamic_acid_NEG.RAW"

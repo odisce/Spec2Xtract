@@ -9,7 +9,11 @@ test_that(
           library(targets)
           list(
             target_Spec2Xtract(
-              files = get_sample_rawfile(),
+              files = file.path(
+                testthat::test_path(),
+                "testdata",
+                "samplefile.raw"
+              ),
               cpd = Spec2Xtract:::example_cpdlist_realdt,
               firstevent = TRUE,
               prec_ppm = 10,

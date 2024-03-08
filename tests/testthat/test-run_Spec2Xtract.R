@@ -5,7 +5,11 @@ test_that(
       path_data <- "./data"
       cpd_path <- file.path(path_data, "cpd.xlsx")
       dir.create(path_data)
-      raw_path <- get_sample_rawfile()
+      raw_path <- file.path(
+        testthat::test_path(),
+        "testdata",
+        "samplefile.raw"
+      )
       openxlsx::write.xlsx(
         Spec2Xtract:::example_cpdlist_realdt,
         cpd_path
