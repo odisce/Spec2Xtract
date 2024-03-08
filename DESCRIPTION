@@ -1,6 +1,6 @@
 Package: Spec2Xtract
 Title: Extract MS2 spectra from LC-MS
-Version: 0.5
+Version: 0.6
 Authors@R: 
     c(
       person(given = "Sylvain", family = "Dechaumet", email = "sylvain.dechaumet@cea.fr", role = c("aut", "cre")),
@@ -21,6 +21,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 biocViews:
 Imports: 
+    crew,
     data.table,
     dplyr,
     ggplot2,
@@ -39,7 +40,6 @@ Imports:
 Suggests: 
     testthat (>= 3.0.0),
     covr,
-    crew,
     msdata
 Remotes: odisce/Spec2Annot
 Config/testthat/edition: 3

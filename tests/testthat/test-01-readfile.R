@@ -33,6 +33,12 @@ test_that(
 
 
 test_that("Spec2Xtract::check_rawfile: .raw", {
+  testthat::expect_error(
+    Spec2Xtract::check_rawfile(
+      "./test/erzezer.zefsdfsdqf"
+    )
+  )
+
   testthat::expect_true(
     Spec2Xtract::check_rawfile(
       rawrr::sampleFilePath()
@@ -42,6 +48,12 @@ test_that("Spec2Xtract::check_rawfile: .raw", {
   f <- tempfile("test", fileext = ".raw")
   data.table::fwrite(x = data.table("test", "A", "B"), file = f)
   testthat::expect_error(
+    Spec2Xtract::check_rawfile(f)
+  )
+
+  f <- tempfile("test", fileext = ".azdazdsqd")
+  data.table::fwrite(x = data.table("test", "A", "B"), file = f)
+  testthat::expect_null(
     Spec2Xtract::check_rawfile(f)
   )
 })

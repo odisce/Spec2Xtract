@@ -648,10 +648,15 @@ target_Spec2Xtract <- function(
     ),
     tar_target_raw(
       "XIC_ggplot", quote({
-        # XIC_data <- tar_read(XIC_data, 1) %>% dplyr::filter(., tar_group == 1)
+        # XIC_data <- tar_read(XIC_data) %>% dplyr::filter(., tar_group == 2)
         # tar_load(c(PEAK_dt, ISOPURITY))
         xic_dt <- as.data.table(XIC_data)
         peakdt_i <- PEAK_dt[CpdIndex == xic_dt[, unique(CpdIndex)]]
+        if (nrow(peakdt_i) <= 0) {
+          message("No peak found for CPD: ", xic_dt[, unique(CpdIndex)])
+          return(NULL)
+        }
+
         ## Get peaks trace
         # peakdt_i <- peaks_full[CpdIndex == 1,]
         peakdt_i[, peakID := paste0("PK", seq_len(.N))]
@@ -660,8 +665,8 @@ target_Spec2Xtract <- function(
           temp_i <- .SD[, .(CpdIndex, FileIndex)]
           rt_range <- c(rtmin, rtmax)
           temp_xic <- xic_dt[temp_i, on = c("CpdIndex", "FileIndex")]
-          temp_xic[rt %between% rt_range,]
-        }, by = .(peakID, CpdIndex, FileIndex)][, .(CpdIndex, FileIndex, rt, i, peakID)]
+          temp_xic[rt %between% rt_range, ]
+        }, by = .(peakID, CpdIndex, FileIndex)][, .(CpdIndex, FileIndex, rt, i, peakID, EventIndex, filter)]
 
         ## Add events
         event_dt <- ISOPURITY$spectra_info_dt[
@@ -669,10 +674,15 @@ target_Spec2Xtract <- function(
           .(rt = StartTime, CpdIndex, FileIndex, msLevel, scanType)
         ] %>%
           unique()
+
         ## Create plot
         rt_lim <- peakdt_i[, c(median(rtmin), median(rtmax))] * c(0.8, 1.2)
         rt_lim[rt_lim <= 0] <- 0
-        ggplot() +
+        if (nrow(peakdt_i) == 0) {
+          return(NULL)
+        }
+
+        plot_out <- ggplot(data = xic_dt, aes(rt, i)) +
           geom_hline(yintercept = 0) +
           geom_vline(
             data = peakdt_i,
@@ -681,20 +691,19 @@ target_Spec2Xtract <- function(
           ) +
           geom_line(
             data = xic_dt,
-            aes(rt, i),
+            aes(rt, i, group = filter),
             alpha = 0.5
           ) +
           geom_line(
             data = peak_xic,
-            aes(rt, i),
+            aes(rt, i, group = filter),
             color = "red"
           ) +
-          geom_point(
+          geom_vline(
             data = event_dt,
-            aes(rt, 0, color = scanType)
+            aes(xintercept = rt, color = scanType)
           ) +
           facet_grid(FileIndex ~ ., scales = "free_x") +
-          # facet_wrap(peakID ~ ., scales = "free_x") +
           theme_bw() +
           xlim(rt_lim) +
           labs(
@@ -705,6 +714,8 @@ target_Spec2Xtract <- function(
             x = "Retention time (min.)",
             y = "Intensity"
           )
+
+        return(plot_out)
       }),
       deployment = "worker",
       pattern = quote(map(XIC_data)),
@@ -856,7 +867,7 @@ target_Spec2Xtract <- function(
     ### Figures: XICs
     tar_target_raw(
       "EXPORT_XICs_gg", substitute({
-        if (is.null(save_dir)) {
+        if (is.null(save_dir) | is.null(XIC_ggplot)) {
           return(FALSE)
         } else {
           ## Create folder
@@ -893,7 +904,10 @@ target_Spec2Xtract <- function(
 #' @param cpd_path path to the table with compound informations
 #' @param ncore Number of parallel workers
 #' @inheritParams target_Spec2Xtract
-#' @import targets openxlsx data.table magrittr
+#' @import targets data.table magrittr
+#' @importFrom crew crew_controller_local
+#' @importFrom tools file_ext
+#' @importFrom openxlsx read.xlsx
 #' @export
 run_Spec2Xtract <- function(
   files_dir,
@@ -931,9 +945,15 @@ run_Spec2Xtract <- function(
               packages = c("data.table", "magrittr", "Spec2Xtract")
             )
 
-            tar_option_set(
-              controller = crew::crew_controller_local(workers = ncore)
-            )
+            if (ncore > 1) {
+              tar_option_set(
+                controller = crew::crew_controller_local(workers = ncore)
+              )
+            } else {
+              tar_option_set(
+                controller = NULL
+              )
+            }
 
             list(
               Spec2Xtract::target_Spec2Xtract(

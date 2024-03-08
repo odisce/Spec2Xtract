@@ -21,6 +21,19 @@ test_that("Spec2Xtract::add_events", {
     )
   )
 
+  expect_error(Spec2Xtract::add_cpd_events(data.table()))
+  temp_event_fail <- copy(temp_event)
+  temp_event_fail$file$MSEvents <- NULL
+  expect_error(Spec2Xtract::add_cpd_events(temp_event_fail))
+  temp_event_fail <- copy(temp_event)
+  temp_event_fail$cpd <- NULL
+  expect_error(Spec2Xtract::add_cpd_events(temp_event_fail))
+  temp_event_fail <- copy(temp_event)
+  temp_event_fail$file$MSEvents[[1]] <- NULL
+  temp_res <- Spec2Xtract::add_cpd_events(temp_event_fail)
+  expect_true(is.data.table(temp_res$cpd[[1]]$MSEvents))
+  expect_true(nrow(temp_res$cpd[[1]]$MSEvents) == 0)
+
   temp_add_events <- Spec2Xtract::cpd_add_events(
     cpd_dt = temp_events$cpd[[1]]$cpd_info,
     ms_events_dt = temp_events$file$MSEvents[[1]],
@@ -58,4 +71,6 @@ test_that("Spec2Xtract::add_events", {
       ) %in% names(temp_add_events)
     )
   )
+
+
 })
