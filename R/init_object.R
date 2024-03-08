@@ -12,21 +12,25 @@
 #' @importFrom utils download.file
 #' @export
 get_sample_rawfile <- function() {
-  tryCatch({
-    url_sample <- "https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS20/391_3-Hydroxy-4-methoxycinnamic_acid_NEG.RAW"
-    temp_dir <- tempdir()
-    temp_file <- file.path(temp_dir, "test.raw")
-    download.file(url = url_sample, destfile = temp_file)
-    if (file.exists(temp_file)) {
-      return(temp_file)
-    } else {
+  if (file.exists(system.file("data/samplefile.raw", package = "Spec2Xtract"))) {
+    return(system.file("data/samplefile.raw", package = "Spec2Xtract"))
+  } else {
+    tryCatch({
+      url_sample <- "https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS20/391_3-Hydroxy-4-methoxycinnamic_acid_NEG.RAW"
+      temp_dir <- tempdir()
+      temp_file <- file.path(temp_dir, "test.raw")
+      download.file(url = url_sample, destfile = temp_file)
+      if (file.exists(temp_file)) {
+        return(temp_file)
+      } else {
+        return(FALSE)
+      }
+    },
+    error = function(e) {
+      print(e)
       return(FALSE)
-    }
-  },
-  error = function(e) {
-    print(e)
-    return(FALSE)
-  })
+    })
+  }
 }
 
 #' Get .raw index as data.table
