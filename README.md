@@ -45,6 +45,29 @@ rawrr::installRawrrExe()
 
 ## Example
 
+## Using one wrapper
+
+`Spec2Xtract` provide a wrapper which will initialize and run all the analysis with one function call.
+First, create a new project and open an R session inside, then run:  
+
+```{r}
+Spec2Xtract::run_Spec2Xtract(
+  files_dir = "/path/to/raw/directory/",
+  cpd_path = "/path/to/cpd_info.xlsx",
+  firstevent = TRUE,
+  prec_ppm = 5,
+  minscan = 3,
+  rt_limit = 0.2,
+  ppm = 6,
+  save_dir = "./report",
+  filter_irel = 0.01,
+  ncore = 1
+)
+```
+
+
+## Using the targets factory
+
 `Spec2Xtract` provide a [`targets`](https://github.com/ropensci/targets) factory to run a full analysis pipeline
 from a list of compound(s) and a list of path to *.raw* file(s) as shown below. [`targets`](https://github.com/ropensci/targets)
 is a great package to manage analytical workflow and this implementation leverage all the functionalities it provides

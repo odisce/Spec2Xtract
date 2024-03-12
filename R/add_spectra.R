@@ -22,8 +22,6 @@ parse_spectrum_object <- function(
   }
   spectrums <- mapply(
     function(spectrum_i, mslevel_i) {
-      # spectrum_i <- spectrum_list[[1]]
-      # mslevel_i <- NULL
       mz_mode <- "NA"
       if (
         ("centroidStream" %in% names(spectrum_i)) &&
@@ -172,31 +170,45 @@ get_spectrum_db <- function(ms_scan_to_get, rawpath) {
     scan = unique(scan_vi$scan),
     mode = ""
   )
-  
   ms_spectrum_parsed <- parse_spectrum_object(
     spectrum_list = ms_spectrum,
     mslevel = NULL
+  )
+
+  ms_spectrum_parsed <- lapply(
+    seq_len(length(ms_spectrum_parsed)),
+    function(x) {
+      ms_spectrum_parsed[[x]][, SpectrumIndex := x]
+      ms_spectrum_parsed[[x]][]
+    }
   )
 
   spectrum_info <- lapply(
     ms_spectrum_parsed,
     function(x) {
       x[, -c("mz", "i")] %>% unique()
-  }) %>%
+    }
+  ) %>%
     data.table::rbindlist()
 
   col_to_add <- setdiff(names(ms_scan_to_get), names(spectrum_info))
   spectrum_info[, spec_scan := as.integer(spec_scan)]
 
   spectrum_info_vf <- merge(
-    spectrum_info[, SpectrumIndex := seq_len(.N)][],
+    spectrum_info,
     ms_scan_to_get[, ..col_to_add],
     by.x = c("spec_scan"),
     by.y = c("scan"),
     all.x = TRUE
   )
+  spectrum_info_vf <- spectrum_info_vf[order(SpectrumIndex), ]
 
-  ms_spectrum_list <- lapply(ms_spectrum_parsed, function(x) {x[, .(mz, i)]})
+  ms_spectrum_list <- lapply(
+    spectrum_info_vf[, SpectrumIndex],
+    function(x) {
+      ms_spectrum_parsed[[x]][, .(mz, i)]
+    }
+  )
 
   return(
     list(

@@ -12,6 +12,7 @@ run_Spec2Xtract(
   minscan,
   rt_limit,
   ppm,
+  filter_irel = 0,
   save_dir,
   ncore = 1
 )
@@ -34,6 +35,8 @@ inside a peak to keep it}
 
 \item{ppm}{mass deviation for elemental composition
 search in ppm}
+
+\item{filter_irel}{Filter ions based on relative intensity}
 
 \item{save_dir}{Directory to save tables}
 

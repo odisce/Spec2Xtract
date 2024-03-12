@@ -1,5 +1,6 @@
 #' targets factory to extract MS2 spectra
 #'
+#' @param filter_irel Filter ions based on relative intensity
 #' @inheritParams init_object
 #' @inheritParams add_events
 #' @inheritParams add_cpd_events
@@ -11,7 +12,7 @@
 #' @inheritParams add_annot
 #' @inheritParams export_tables
 #' @return A list of targets objects.
-#' @import targets tarchetypes data.table magrittr ggplot2 ggpubr
+#' @import targets tarchetypes data.table magrittr ggplot2 ggpubr ggrepel
 #' @export
 #' @examples
 #' \dontrun{
@@ -47,6 +48,7 @@ target_Spec2Xtract <- function(
     prec_ppm = 10,
     minscan = 3,
     rt_limit = 1,
+    filter_irel = 0,
     ppm = 3) {
   list(
     ## Inputs
@@ -144,6 +146,9 @@ target_Spec2Xtract <- function(
       "CPD_EVENTS",
       quote({
         temp_dt <- copy(F_EVENTS)
+        if (temp_dt[, .N] < 1) {
+          return(NULL)
+        }
         temp_dt[, EventIndex := seq_len(.N)]
         temp_dt[,
           c("CpdEventPrec", "CPDCheck") := {
@@ -213,7 +218,7 @@ target_Spec2Xtract <- function(
                       "AB" = AB
                     )
 
-                    if (AB <= iso_win*0.01) {
+                    if (AB <= iso_win * 0.01) {
                       out[, diffok := TRUE]
                     } else {
                       out[, diffok := FALSE]
@@ -228,7 +233,10 @@ target_Spec2Xtract <- function(
                     mz_in_range[diffok == TRUE, ]
                   ) %>%
                     igraph::components() %>% {
-                      as.data.table(.$membership, keep.rownames = TRUE)
+                      as.data.table(
+                        .$membership,
+                        keep.rownames = TRUE
+                      )
                     }
                   setnames(grpi_dt, c("spec_prec", "grpi"))
                   grpi_dt[, spec_prec := as.numeric(spec_prec)]
@@ -251,7 +259,7 @@ target_Spec2Xtract <- function(
                 grpi_dic[, grpi := 1]
               }
               grp_i_uk <- grpi_dic[order(spec_prec), ][is.na(grpi), ]
-              grp_i_uk[, grpi := grp_i_max:(grp_i_max+.N-1)]
+              grp_i_uk[, grpi := grp_i_max:(grp_i_max + .N - 1)]
 
               output_i <- rbind(
                 grp_i_uk,
@@ -391,6 +399,9 @@ target_Spec2Xtract <- function(
     ## Check MSEvent in best peak range
     tar_target_raw(
       "MSEVENT2EXTRACT", quote({
+        # CPD_PEAKS <- tar_read(CPD_PEAKS, 1)[[1]]
+        # CPD_EVENTS <- tar_read(CPD_EVENTS, 1)[[1]]
+        # tar_load(c(CPD_INFO_dt, F_INDEX))
         if (is.null(CPD_PEAKS) || nrow(CPD_PEAKS) <= 0 || CPD_PEAKS[BestPeak == TRUE, .N] <= 0) {
           ## No peaks detected, returning null
           return(NULL)
@@ -410,11 +421,17 @@ target_Spec2Xtract <- function(
 
           ## For each event get scan closest to the apex
           rtref <- CPD_INFO_dt[CpdIndex == CPD_EVENTS[, unique(CpdIndex)], rtmin]
+
           F_INDEX_dt_i <- merge(
             F_INDEX_dt_i,
             CPD_EVENTS[, .(scanType, EventIndexUn)],
             by = "scanType"
           )
+
+          ## If no ref rt, get the best peak rt
+          if (is.na(rtref)) {
+            rtref <- CPD_PEAKS[BestPeak == TRUE, rt]
+          }
           scan_to_get <- F_INDEX_dt_i[,
             {
               .SD[which.min(abs(StartTime - rtref)), ]
@@ -450,13 +467,22 @@ target_Spec2Xtract <- function(
     ## read access)
     tar_target_raw(
       "MSSPECTRA_ITER", quote({
-        MSEVENT2EXTRACT_dt[, unique(FileIndex)]
+        if (MSEVENT2EXTRACT_dt[, .N] < 1) {
+          return(FALSE)
+        } else {
+          MSEVENT2EXTRACT_dt[, unique(FileIndex)]
+        }
       }),
       deployment = "main",
       packages = c("data.table")
     ),
+
     tar_target_raw(
       "MSSPECTRA", quote({
+        if (isFALSE(MSSPECTRA_ITER)) {
+          return(FALSE)
+        }
+        # tar_load(c(F_INFO_dt, MSEVENT2EXTRACT_dt))
         file_info_i <- F_INFO_dt[FileIndex == MSSPECTRA_ITER, ]
         scan_to_get_i <- MSEVENT2EXTRACT_dt[FileIndex == MSSPECTRA_ITER, ]
         spectra_db <- get_spectrum_db(
@@ -473,6 +499,9 @@ target_Spec2Xtract <- function(
     ),
     tar_target_raw(
       "MSSPECTRA_COMB", quote({
+        if (all(sapply(MSSPECTRA, isFALSE))) {
+          return(NULL)
+        }
         spec_info <- data.table()
         spec_list <- list()
         spec_index <- 0
@@ -528,8 +557,15 @@ target_Spec2Xtract <- function(
     ## Calculate isolation purity
     tar_target_raw(
       "ISOPURITY", substitute({
-        # tar_load(c(MSSPECTRA_COMB, CPD_INFO_dt))
+        if (is.null(MSSPECTRA_COMB)) {
+          return(NULL)
+        }
         ## Calculate purity on MS1
+        
+        .SD <- MSSPECTRA_COMB$spectra_info_dt[SpecID == "CPD01_File06_SPEC015",]
+        CpdIndex <- .SD[, unique(CpdIndex)]
+        SpectrumIndex <- .SD[, unique(SpectrumIndex)]
+
         MSSPECTRA_COMB$spectra_info_dt[
           msLevel == 2,
           "isopurity" := {
@@ -540,13 +576,16 @@ target_Spec2Xtract <- function(
             if (nrow(temp_events) > 0) {
               ## Select one of the MS1 spectra
               CpdIndex_i <- unique(CpdIndex)
-              SpectrumIndex_i <- unique(SpectrumIndex)
+              SpectrumIndex_i <- unique(temp_events$SpectrumIndex)
               iso_purity_val <- getpurity_from_spectrum(
                 spectrum_ms = MSSPECTRA_COMB$spectra_db[[SpectrumIndex_i]],
                 msn_info = .SD[, .(spec_polarity, spec_precmz, spec_isowin)],
                 cpd_info = CPD_INFO_dt[CpdIndex == CpdIndex_i, .(mz_pos, mz_neg)],
                 prec_ppm = prec_ppm
               )
+            }
+            if (is.na(iso_purity_val) || is.infinite(iso_purity_val)) {
+              iso_purity_val <- 0
             }
             iso_purity_val
           },
@@ -561,14 +600,21 @@ target_Spec2Xtract <- function(
     ## Add annotations layer
     tar_target_raw(
       "ANNOT_ITER", quote({
+        if (is.null(ISOPURITY)) {
+          return(FALSE)
+        }
         ISOPURITY$spectra_info_dt[msLevel > 1, .(iter, SpectrumIndex, CpdIndex, FileIndex)][, unique(iter)]
       }),
       deployment = "main",
       packages = c("data.table", "magrittr")
     ),
+
     tar_target_raw(
       "ANNOT", substitute({
         ## Add annotation to a different layer if multiple cpd for the same spectrum
+        if (isFALSE(ANNOT_ITER)) {
+          return(NULL)
+        }
         spec_info_i <- ISOPURITY$spectra_info_dt[iter == ANNOT_ITER, ]
         cpd_info_i <- CPD_INFO_dt[CpdIndex == spec_info_i$CpdIndex, ]
         spec_annot_i <- Spec2Annot::annotate_mz(
@@ -597,9 +643,15 @@ target_Spec2Xtract <- function(
     ## Make plots by compound
     tar_target_raw(
       "XIC_data", quote({
-        rbindlist(CPD_XICs) %>%
-          dplyr::group_by(., CpdIndex) %>%
-          targets::tar_group()
+        temp_dt <- rbindlist(CPD_XICs)
+        if (nrow(temp_dt) == 0) {
+          stop("XICs extraction failed")
+          data.table(group = as.integer())
+        } else {
+          temp_dt %>%
+            dplyr::group_by(., CpdIndex) %>%
+            targets::tar_group()
+        }
       }),
       deployment = "worker",
       iteration = "group",
@@ -625,8 +677,13 @@ target_Spec2Xtract <- function(
       deployment = "worker",
       packages = c("data.table", "magrittr")
     ),
+
     tar_target_raw(
       "XIC_ggplot", quote({
+        if (is.null(XIC_data)) {
+          return(NULL)
+        }
+
         xic_dt <- as.data.table(XIC_data)
         peakdt_i <- PEAK_dt[CpdIndex == xic_dt[, unique(CpdIndex)]]
         if (nrow(peakdt_i) <= 0) {
@@ -644,6 +701,10 @@ target_Spec2Xtract <- function(
         }, by = .(peakID, CpdIndex, FileIndex)][, .(CpdIndex, FileIndex, rt, i, peakID, EventIndex, filter)]
 
         ## Add events
+        if (is.null(ISOPURITY)) {
+          return(NULL)
+        }
+
         event_dt <- ISOPURITY$spectra_info_dt[
           CpdIndex == xic_dt[, unique(CpdIndex)],
           .(rt = StartTime, CpdIndex, FileIndex, msLevel, scanType)
@@ -702,16 +763,33 @@ target_Spec2Xtract <- function(
       "SUMMARY_dt", quote({
         peak_dt <- PEAK_dt[, .(PeakDetected = .N), by = .(CpdIndex)]
         CPD_INFO_dt[, "FileNb" := F_INFO_dt[, .N]]
-        isopurity_dt <- ISOPURITY$spectra_info_dt[
-          msLevel > 1,
-          .(IsoPurity_mean = mean(isopurity, na.rm = TRUE)),
-          by = .(CpdIndex)
-        ]
-        msspectra_dt <- ISOPURITY$spectra_info_dt[
-          msLevel > 1,
-          .(MS2Spectra = .N),
-          by = .(CpdIndex)
-        ]
+        if (is.null(ISOPURITY) && is.null(ANNOT)) {
+          return(NULL)
+        }
+        if (is.null(ISOPURITY)) {
+          isopurity_dt <- data.table(
+            msLevel = as.integer(),
+            IsoPurity_mean = as.numeric(),
+            CpdIndex = peak_dt[, unique(CpdIndex)]
+          )
+          msspectra_dt <- data.table(
+            MS2Spectra = as.integer(),
+            CpdIndex = as.integer()
+          )
+        } else {
+          isopurity_dt <- ISOPURITY$spectra_info_dt[
+            msLevel > 1,
+            .(IsoPurity_mean = mean(isopurity, na.rm = TRUE)),
+            by = .(CpdIndex)
+          ]
+
+          msspectra_dt <- ISOPURITY$spectra_info_dt[
+            msLevel > 1,
+            .(MS2Spectra = .N),
+            by = .(CpdIndex)
+          ]
+        }
+
         annotatedspec_dt <- ANNOT[
           ,
           .N,
@@ -742,6 +820,9 @@ target_Spec2Xtract <- function(
 
     tar_target_raw(
       "SUMMARYEVENT_dt", quote({
+        if (is.null(ISOPURITY)) {
+          return(NULL)
+        }
         col_to_keep <- grep(
           "spec_",
           names(ISOPURITY$spectra_info_dt),
@@ -772,8 +853,52 @@ target_Spec2Xtract <- function(
       packages = c("data.table", "magrittr")
     ),
 
-    ## Export data
-    ### Tables
+    tar_target_raw(
+      "SPECTRA_DB", substitute(
+        {
+          if (!is.null(ISOPURITY)) {
+            spectra_msn_info <- ISOPURITY$spectra_info_dt[msLevel > 1, ]
+            output <- lapply(
+              seq_len(spectra_msn_info[, .N]),
+              function(x) {
+                SpectrumIndex_i <- spectra_msn_info[x, SpectrumIndex]
+                temp_sp <- ISOPURITY$spectra_db[[SpectrumIndex_i]]
+                ## Add annot
+                spec_annot <- ANNOT[SpectrumIndex == SpectrumIndex_i, -c("SpectrumIndex", "CpdIndex", "FileIndex")]
+                if (nrow(spec_annot) > 0) {
+                  mz_to_exclude <- spec_annot[, mz]
+                  spec_out <- rbind(
+                    spec_annot,
+                    temp_sp[!mz %in% mz_to_exclude, ],
+                    fill = TRUE
+                  )
+                } else {
+                  spec_out <- temp_sp
+                }
+                spec_out[, irel := i / max(i)]
+                new_colorder <- c("mz", "i", "irel", "formula", "ppm")
+                new_colorder <- intersect(new_colorder, names(spec_out))
+                setcolorder(spec_out, new_colorder)
+                spec_out[, SpectrumIndex := SpectrumIndex_i]
+                return(spec_out[irel >= filter_irel, ])
+              }
+            ) %>%
+              rbindlist(., fill = TRUE)
+            list(
+              "spectra_info_dt" = spectra_msn_info,
+              "spectra_db" = split(output, output$SpectrumIndex)
+            )
+          } else {
+            return(NULL)
+          }
+        }
+      ),
+      deployment = 'main',
+      packages = c("data.table", "magrittr", "Spec2Xtract", "Spec2Annot")
+    ),
+
+    ## Export data ----
+    ### Tables ----
     tar_target_raw(
       "EXPORT", substitute({
         if (is.null(save_dir)) {
@@ -786,13 +911,17 @@ target_Spec2Xtract <- function(
           save_l <- list(
             "summary_table" = file.path(save_dir, "Summary.xlsx"),
             "summary_events" = file.path(save_dir, "EventSummary.xlsx"),
-            "Spectra_dir" = file.path(save_dir, "spectra")
+            "Spectra_dir" = file.path(save_dir, "spectra"),
+            "Spectra_dir_msp" = file.path(save_dir, "spectra", "msp"),
+            "Spectra_dir_xlsx" = file.path(save_dir, "spectra", "xlsx")
           )
 
-          save_l$Spectra_dir %>% {
-            if (!dir.exists(.)) {
-              dir.create(., recursive = TRUE)
-            }
+          save_l[grepl("dir", names(save_l))] %>% {
+            sapply(., function(x) {
+              if (!dir.exists(x)) {
+                dir.create(x, recursive = TRUE)
+              }
+            })
           }
 
           if (!is.null(SUMMARY_dt)) {
@@ -804,34 +933,30 @@ target_Spec2Xtract <- function(
           }
 
           ## Export individual spectra
-          temp <- ISOPURITY$spectra_info_dt[msLevel > 1, {
-            SpectrumIndex_i <- SpectrumIndex
-            temp_sp <- ISOPURITY$spectra_db[[SpectrumIndex_i]]
-            ## Add annot
-            spec_annot <- ANNOT[SpectrumIndex == SpectrumIndex_i, -c("SpectrumIndex", "CpdIndex", "FileIndex")]
-            if (nrow(spec_annot) > 0) {
-              mz_to_exclude <- spec_annot[, mz]
-              spec_out <- rbind(
-                spec_annot,
-                temp_sp[!mz %in% mz_to_exclude, ],
-                fill = TRUE
-              )
-            } else {
-              spec_out <- temp_sp
-            }
-            spec_out[, irel := i / max(i)]
-            new_colorder <- c("mz", "i", "irel", "formula", "ppm")
-            new_colorder <- intersect(new_colorder, names(spec_out))
-            setcolorder(spec_out, new_colorder)
-            save_path <- file.path(save_l$Spectra_dir, paste0(SpecID, ".xlsx"))
-            temp <- openxlsx::write.xlsx(
-              x = spec_out[order(mz)],
-              file = save_path,
-              overwrite = TRUE
+          if (!is.null(SPECTRA_DB)) {
+            temp <- lapply(
+              SPECTRA_DB$spectra_info_dt[, seq_len(.N)],
+              function(x) {
+                spectra_info_i <- SPECTRA_DB$spectra_info_dt[x, ]
+                spec_out <- SPECTRA_DB$spectra_db[[x]]
+                ## Save xlsx
+                save_path <- file.path(save_l$Spectra_dir_xlsx, paste0(spectra_info_i$SpecID, ".xlsx"))
+                temp <- openxlsx::write.xlsx(
+                  x = spec_out[order(mz)],
+                  file = save_path,
+                  overwrite = TRUE
+                )
+                ## Save msp
+                save_path <- file.path(save_l$Spectra_dir_msp, paste0(spectra_info_i$SpecID, ".msp"))
+                temp <- save_as_msp(
+                  spectra_dt = spec_out,
+                  spectra_info = spectra_info_i,
+                  cpd_info = CPD_INFO_dt[CpdIndex == spectra_info_i$CpdIndex, ],
+                  file_out = save_path
+                )
+              }
             )
-            TRUE
-          }, by = iter]
-
+          }
           return(TRUE)
         }
       }),
@@ -839,7 +964,7 @@ target_Spec2Xtract <- function(
       packages = c("data.table", "magrittr", "openxlsx")
     ),
 
-    ### Figures: XICs
+    ### Figures: XICs ----
     tar_target_raw(
       "EXPORT_XICs_gg", substitute({
         if (is.null(save_dir) | is.null(XIC_ggplot)) {
@@ -866,8 +991,124 @@ target_Spec2Xtract <- function(
       pattern = quote(map(XIC_ggplot, XIC_data)),
       deployment = "main",
       packages = c("data.table", "magrittr", "ggplot2", "ggpubr")
-    )
+    ),
 
+    ### Figures: Spectra ----
+    tar_target_raw(
+      "SPECTRA_gg_ITER", quote({
+        if (is.null(SPECTRA_DB)) {
+          return(FALSE)
+        } else {
+          seq_len(SPECTRA_DB$spectra_info_dt[, .N])
+        }
+      }),
+      deployment = "main",
+      packages = c("data.table")
+    ),
+
+    tar_target_raw(
+      "EXPORT_SPECTRA_gg", substitute({
+        if (isFALSE(SPECTRA_gg_ITER)) {
+          return(NULL)
+        }
+        # tar_load(c(SPECTRA_DB, CPD_INFO_dt, F_INFO_dt))
+        save_dir_xics <- file.path(save_dir, "figures", "spectra")
+        if (!dir.exists(save_dir_xics)) {
+          dir.create(save_dir_xics, recursive = TRUE)
+        }
+        spectra_info_i <- SPECTRA_DB$spectra_info_dt[SPECTRA_gg_ITER, ]
+        spectra_i <- SPECTRA_DB$spectra_db[[SPECTRA_gg_ITER]]
+        cpd_info_i <- CPD_INFO_dt[CpdIndex == spectra_info_i$CpdIndex, ]
+        file_info_i <- F_INFO_dt[FileIndex == spectra_info_i$FileIndex, ]
+        output <- ggplot(spectra_i, aes(mz, irel)) +
+          geom_hline(yintercept = 0) +
+          geom_vline(
+            xintercept = as.numeric(spectra_info_i$spec_precmz),
+            linetype = 2,
+            color = "red"
+          ) +
+          geom_text(
+            aes(
+              x = as.numeric(spectra_info_i$spec_precmz),
+              y = +Inf,
+              label = "precursor",
+              vjust = 1,
+              hjust = 1
+            ),
+            color = "red"
+          ) +
+          geom_linerange(
+            aes(
+              ymin = 0, 
+              ymax = irel
+            )
+          ) +
+          geom_linerange(
+            data = spectra_i[!is.na(formula), ],
+            aes(
+              ymin = 0,
+              ymax = irel
+            ),
+            color = "#003049"
+          ) +
+          ggrepel::geom_text_repel(
+            data = spectra_i[!is.na(formula), ],
+            aes(
+              label = paste0(
+                formula, "\n",
+                sprintf("%0.4f", mz)
+              )
+            ),
+            color = "#669bbc",
+            vjust = 1,
+            min.segment.length = 0
+          ) +
+          theme_bw() +
+          scale_x_continuous(
+            breaks = pretty(spectra_i$mz, n = 10),
+            minor_breaks = pretty(spectra_i$mz, n = 100)
+          ) +
+          labs(
+            title = cpd_info_i$compound,
+            subtitle = paste0(
+              cpd_info_i$elemcomposition, " (precusor m/Z: ",
+              sprintf("%0.5f", as.numeric(spectra_info_i$spec_precmz)), ")", "\n",
+              "Isolation Purity: ", sprintf("%0.2f", as.numeric(spectra_info_i$isopurity)), "%"
+            ),
+            x = "m/Z",
+            y = "Relative intensity (max)",
+            caption = paste0(
+              "File: ", file_info_i$file_name, "\n",
+              "MSLevel: ", spectra_info_i$msLevel, "\n",
+              "Isolation window: ",
+              sprintf("%0.4f", as.numeric(spectra_info_i$spec_precmz)), " +- ",
+              spectra_info_i$spec_isowin, "\n",
+              "Collision Type: ", spectra_info_i$spec_coltype, "\n",
+              "          Energy: ", spectra_info_i$spec_energy, "\n",
+              "scanType: ", spectra_info_i$scanType, "\n",
+              "ID: ", spectra_info_i$SpecID
+            )
+          )
+        
+        new_x <- c(
+          spectra_i[, mz],
+          as.numeric(spectra_info_i$spec_precmz) + c(-2, +2)
+        )
+        new_xrange <- range(new_x)
+        output <- output +
+          scale_x_continuous(
+            breaks = pretty(new_x, n = 10),
+            minor_breaks = pretty(new_x, n = 100)
+          ) +
+          xlim(new_xrange[1], new_xrange[2])
+
+        save_path <- file.path(save_dir_xics, paste0(spectra_info_i$SpecID, ".png"))
+        ggsave(save_path, plot = output, w = 16, h = 9)
+      }),
+      pattern = quote(map(SPECTRA_gg_ITER)),
+      deployment = "main",
+      packages = c("data.table", "magrittr", "ggplot2", "ggpubr", "ggrepel")
+    )
   )
 }
 
@@ -894,6 +1135,7 @@ run_Spec2Xtract <- function(
   minscan,
   rt_limit,
   ppm,
+  filter_irel = 0,
   save_dir,
   ncore = 1
 ) {
@@ -946,7 +1188,8 @@ run_Spec2Xtract <- function(
                 minscan = minscan,
                 rt_limit = rt_limit,
                 ppm = ppm,
-                save_dir = save_dir
+                save_dir = save_dir,
+                filter_irel = filter_irel
               )
             )
           },
@@ -962,7 +1205,8 @@ run_Spec2Xtract <- function(
         rt_limit = eval(rt_limit),
         ppm = eval(ppm),
         save_dir = eval(save_dir),
-        ncore = eval(ncore)
+        ncore = eval(ncore),
+        filter_irel = eval(filter_irel)
       )
     )
   )

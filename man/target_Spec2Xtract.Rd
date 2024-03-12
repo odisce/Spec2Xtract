@@ -12,6 +12,7 @@ target_Spec2Xtract(
   prec_ppm = 10,
   minscan = 3,
   rt_limit = 1,
+  filter_irel = 0,
   ppm = 3
 )
 }
@@ -32,6 +33,8 @@ columns: compound, rtsec, elemcomposition and optionally inchikey}
 inside a peak to keep it}
 
 \item{rt_limit}{limit rt deviation from reference when searching peaks}
+
+\item{filter_irel}{Filter ions based on relative intensity}
 
 \item{ppm}{mass deviation for elemental composition
 search in ppm}
