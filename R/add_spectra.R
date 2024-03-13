@@ -24,8 +24,7 @@ parse_spectrum_object <- function(
     function(spectrum_i, mslevel_i) {
       mz_mode <- "NA"
       if (
-        ("centroidStream" %in% names(spectrum_i)) &&
-          isFALSE(spectrum_i$centroidStream)
+        ("centroidStream" %in% names(spectrum_i))
       ) {
         if (
           ("HasCentroidStream" %in% names(spectrum_i)) &&
