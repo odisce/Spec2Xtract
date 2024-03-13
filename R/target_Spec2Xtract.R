@@ -482,7 +482,7 @@ target_Spec2Xtract <- function(
         if (isFALSE(MSSPECTRA_ITER)) {
           return(FALSE)
         }
-        # tar_load(c(F_INFO_dt, MSEVENT2EXTRACT_dt))
+        # tar_load(c(F_INFO_dt, MSEVENT2EXTRACT_dt)) ; MSSPECTRA_ITER <- tar_read(MSSPECTRA_ITER)[[1]]
         file_info_i <- F_INFO_dt[FileIndex == MSSPECTRA_ITER, ]
         scan_to_get_i <- MSEVENT2EXTRACT_dt[FileIndex == MSSPECTRA_ITER, ]
         spectra_db <- get_spectrum_db(
