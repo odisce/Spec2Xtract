@@ -952,7 +952,9 @@ target_Spec2Xtract <- function(
               SPECTRA_DB$spectra_info_dt[, seq_len(.N)],
               function(x) {
                 spectra_info_i <- SPECTRA_DB$spectra_info_dt[x, ]
-                spec_out <- SPECTRA_DB$spectra_db[[x]]
+                # spec_out <- SPECTRA_DB$spectra_db[[x]]
+                spec_ind <- which(names(SPECTRA_DB$spectra_db) == as.character(spectra_info_i$SpectrumIndex))
+                spec_out <- SPECTRA_DB$spectra_db[[spec_ind]]
                 ## Save xlsx
                 save_path <- file.path(save_l$Spectra_dir_xlsx, paste0(spectra_info_i$SpecID, ".xlsx"))
                 temp <- openxlsx::write.xlsx(
