@@ -169,6 +169,7 @@ get_spectrum_db <- function(ms_scan_to_get, rawpath) {
     scan = unique(scan_vi$scan),
     mode = ""
   )
+  
   ms_spectrum_parsed <- parse_spectrum_object(
     spectrum_list = ms_spectrum,
     mslevel = NULL
@@ -200,15 +201,17 @@ get_spectrum_db <- function(ms_scan_to_get, rawpath) {
     by.y = c("scan"),
     all.x = TRUE
   )
+
   spectrum_info_vf <- spectrum_info_vf[order(SpectrumIndex), ]
 
   ms_spectrum_list <- lapply(
-    spectrum_info_vf[, SpectrumIndex],
+    ms_spectrum_parsed,
     function(x) {
-      ms_spectrum_parsed[[x]][, .(mz, i)]
+      x[, .(mz, i)]
     }
   )
-
+  names(ms_spectrum_list) <- sapply(ms_spectrum_parsed, function(x) {unique(x$SpectrumIndex)})
+  
   return(
     list(
       "spectra_info_dt" = spectrum_info_vf[],

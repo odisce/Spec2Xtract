@@ -13,7 +13,8 @@ target_Spec2Xtract(
   minscan = 3,
   rt_limit = 1,
   filter_irel = 0,
-  ppm = 3
+  ppm = 3,
+  resources = targets::tar_option_get("resources")
 )
 }
 \arguments{

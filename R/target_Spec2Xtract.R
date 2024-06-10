@@ -49,13 +49,16 @@ target_Spec2Xtract <- function(
     minscan = 3,
     rt_limit = 1,
     filter_irel = 0,
-    ppm = 3) {
+    ppm = 3,
+    resources = targets::tar_option_get("resources")
+    ) {
   list(
     ## Inputs
     tarchetypes::tar_files_raw(
       "FILE_IN",
       substitute(files),
-      deployment = "worker"
+      deployment = "worker",
+      resources = resources
     ),
     tar_target_raw(
       "CPD_IN",
@@ -107,6 +110,7 @@ target_Spec2Xtract <- function(
       pattern = quote(map(F_INFO_dt)),
       iteration = "list",
       deployment = "worker",
+      resources = resources,
       packages = c("magrittr", "data.table", "Spec2Xtract")
     ),
 
@@ -138,6 +142,7 @@ target_Spec2Xtract <- function(
       pattern = quote(map(F_INFO_dt, F_INDEX)),
       iteration = "list",
       deployment = "worker",
+      resources = resources,
       packages = c("magrittr", "data.table", "Spec2Xtract")
     ),
 
@@ -284,6 +289,7 @@ target_Spec2Xtract <- function(
       pattern = quote(cross(CPD_INFO_dt, F_EVENTS)),
       iteration = "list",
       deployment = "worker",
+      resources = resources,
       packages = c("data.table", "magrittr", "Spec2Xtract")
     ),
 
@@ -313,6 +319,7 @@ target_Spec2Xtract <- function(
       pattern = quote(map(CPD_EVENTS)),
       iteration = "list",
       deployment = "worker",
+      resources = resources,
       packages = c("data.table", "magrittr", "Spec2Xtract")
     ),
 
@@ -393,6 +400,7 @@ target_Spec2Xtract <- function(
       pattern = quote(map(CPD_XICs, CPD_EVENTS)),
       iteration = "list",
       deployment = "worker",
+      resources = resources,
       packages = c("data.table", "magrittr", "Spec2Xtract")
     ),
 
@@ -450,6 +458,7 @@ target_Spec2Xtract <- function(
       pattern = quote(map(CPD_PEAKS, CPD_EVENTS)),
       iteration = "list",
       deployment = "worker",
+      resources = resources,
       packages = c("data.table", "magrittr", "Spec2Xtract")
     ),
     tar_target_raw(
@@ -495,6 +504,7 @@ target_Spec2Xtract <- function(
       pattern = quote(map(MSSPECTRA_ITER)),
       iteration = "list",
       deployment = "worker",
+      resources = resources,
       packages = c("data.table", "magrittr", "Spec2Xtract")
     ),
     tar_target_raw(
@@ -636,6 +646,7 @@ target_Spec2Xtract <- function(
         }
       }),
       deployment = "worker",
+      resources = resources,
       pattern = quote(map(ANNOT_ITER)),
       packages = c("data.table", "magrittr", "Spec2Xtract", "Spec2Annot")
     ),
@@ -654,6 +665,7 @@ target_Spec2Xtract <- function(
         }
       }),
       deployment = "worker",
+      resources = resources,
       iteration = "group",
       packages = c("data.table", "dplyr", "targets", "magrittr")
     ),
@@ -675,6 +687,7 @@ target_Spec2Xtract <- function(
         return(peaks_dt)
       }),
       deployment = "worker",
+      resources = resources,
       packages = c("data.table", "magrittr")
     ),
 
@@ -754,6 +767,7 @@ target_Spec2Xtract <- function(
         return(plot_out)
       }),
       deployment = "worker",
+      resources = resources,
       pattern = quote(map(XIC_data)),
       iteration = "list",
       packages = c("data.table", "magrittr", "ggplot2")
@@ -938,7 +952,9 @@ target_Spec2Xtract <- function(
               SPECTRA_DB$spectra_info_dt[, seq_len(.N)],
               function(x) {
                 spectra_info_i <- SPECTRA_DB$spectra_info_dt[x, ]
-                spec_out <- SPECTRA_DB$spectra_db[[x]]
+                # spec_out <- SPECTRA_DB$spectra_db[[x]]
+                spec_ind <- which(names(SPECTRA_DB$spectra_db) == as.character(spectra_info_i$SpectrumIndex))
+                spec_out <- SPECTRA_DB$spectra_db[[spec_ind]]
                 ## Save xlsx
                 save_path <- file.path(save_l$Spectra_dir_xlsx, paste0(spectra_info_i$SpecID, ".xlsx"))
                 temp <- openxlsx::write.xlsx(

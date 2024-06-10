@@ -48,8 +48,7 @@ save_as_msp <- function(
       " ; ",
       "IsoPurity: ",
       sprintf("%0.2f", as.numeric(spectra_info$isopurity))
-    ),
-    "NUM PEAKS" = spectra_dt[, .N]
+    )
   )
 
   ## Replace by cpd_info column names if present
@@ -60,6 +59,9 @@ save_as_msp <- function(
     names(temp_add) <- stringr::str_to_upper(names(temp_add))
     info_list <- c(info_list[!names(info_list) %in% names(temp_add)], temp_add)
   }
+
+  ## Add last 
+  info_list$`NUM PEAKS` <- spectra_dt[, .N]
 
   ## Write msp
   file_out <- normalizePath(file_out)
@@ -77,7 +79,7 @@ save_as_msp <- function(
   spectra_dt <- spectra_dt[order(mz), ]
   for (i in seq_len(spectra_dt[, .N+2])) {
     if (i > spectra_dt[, .N]) {
-      write("", file = file_out, append = TRUE)  
+      write("", file = file_out, append = TRUE)
     } else {
       str_to_append <- paste0(
         spectra_dt[i, mz] %>% sprintf("%.6f", .), " ",
