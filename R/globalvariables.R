@@ -2,6 +2,7 @@ globalVariables(
   c(
     ".",
     "..col_to_add",
+    "..info_to_add",
     "col_info",
     "compound",
     "cpd_index",
