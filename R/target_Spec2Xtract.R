@@ -11,6 +11,7 @@
 #' @inheritParams add_mspurity
 #' @inheritParams add_annot
 #' @inheritParams export_tables
+#' @inheritParams targets::tar_target_raw
 #' @return A list of targets objects.
 #' @import targets tarchetypes data.table magrittr ggplot2 ggpubr ggrepel
 #' @export
@@ -41,17 +42,17 @@
 #'   })
 #' }
 target_Spec2Xtract <- function(
-    files,
-    cpd,
-    save_dir = NULL,
-    firstevent = TRUE,
-    prec_ppm = 10,
-    minscan = 3,
-    rt_limit = 1,
-    filter_irel = 0,
-    ppm = 3,
-    resources = targets::tar_option_get("resources")
-    ) {
+  files,
+  cpd,
+  save_dir = NULL,
+  firstevent = TRUE,
+  prec_ppm = 10,
+  minscan = 3,
+  rt_limit = 1,
+  filter_irel = 0,
+  ppm = 3,
+  resources = targets::tar_option_get("resources")
+) {
   list(
     ## Inputs
     tarchetypes::tar_files_raw(
@@ -71,8 +72,7 @@ target_Spec2Xtract <- function(
     tar_target_raw(
       "F_INFO_dt",
       quote({
-        temp <- load_files(FILE_IN)
-        return(temp)
+        return(load_files(FILE_IN))
       }),
       deployment = "main"
     ),
@@ -96,7 +96,7 @@ target_Spec2Xtract <- function(
                 get_rawindex() %>%
                 parse_index_dt()
               temp_dt[, FileIndex := F_INFO_dt$FileIndex]
-              temp_dt[]
+              return(temp_dt[])
             },
             error = function(e) {
               warning(e)
@@ -407,9 +407,6 @@ target_Spec2Xtract <- function(
     ## Check MSEvent in best peak range
     tar_target_raw(
       "MSEVENT2EXTRACT", quote({
-        # CPD_PEAKS <- tar_read(CPD_PEAKS, 1)[[1]]
-        # CPD_EVENTS <- tar_read(CPD_EVENTS, 1)[[1]]
-        # tar_load(c(CPD_INFO_dt, F_INDEX))
         if (is.null(CPD_PEAKS) || nrow(CPD_PEAKS) <= 0 || CPD_PEAKS[BestPeak == TRUE, .N] <= 0) {
           ## No peaks detected, returning null
           return(NULL)
@@ -491,7 +488,6 @@ target_Spec2Xtract <- function(
         if (isFALSE(MSSPECTRA_ITER)) {
           return(FALSE)
         }
-        # tar_load(c(F_INFO_dt, MSEVENT2EXTRACT_dt)) ; MSSPECTRA_ITER <- tar_read(MSSPECTRA_ITER)[[1]]
         file_info_i <- F_INFO_dt[FileIndex == MSSPECTRA_ITER, ]
         scan_to_get_i <- MSEVENT2EXTRACT_dt[FileIndex == MSSPECTRA_ITER, ]
         spectra_db <- get_spectrum_db(
@@ -1027,13 +1023,13 @@ target_Spec2Xtract <- function(
         if (isFALSE(SPECTRA_gg_ITER)) {
           return(NULL)
         }
-        # tar_load(c(SPECTRA_DB, CPD_INFO_dt, F_INFO_dt))
         save_dir_xics <- file.path(save_dir, "figures", "spectra")
         if (!dir.exists(save_dir_xics)) {
           dir.create(save_dir_xics, recursive = TRUE)
         }
         spectra_info_i <- SPECTRA_DB$spectra_info_dt[SPECTRA_gg_ITER, ]
-        spectra_i <- SPECTRA_DB$spectra_db[[SPECTRA_gg_ITER]]
+        spec_ind <- which(names(SPECTRA_DB$spectra_db) == as.character(spectra_info_i$SpectrumIndex))
+        spectra_i <- SPECTRA_DB$spectra_db[[spec_ind]]
         cpd_info_i <- CPD_INFO_dt[CpdIndex == spectra_info_i$CpdIndex, ]
         file_info_i <- F_INFO_dt[FileIndex == spectra_info_i$FileIndex, ]
         output <- ggplot(spectra_i, aes(mz, irel)) +
