@@ -23,7 +23,9 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::covr
+          extra-packages:
+            any::covr
+            any::xml2
           needs: coverage
 
       - name: Test coverage
@@ -37,16 +39,3 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Show testthat output
-        if: always()
-        run: |
-          ## --------------------------------------------------------------------
-          find ${{ runner.temp }}/package -name 'testthat.Rout*' -exec cat '{}' \; || true
-        shell: bash
-
-      - name: Upload test results
-        if: failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage-test-failures
-          path: ${{ runner.temp }}/package
