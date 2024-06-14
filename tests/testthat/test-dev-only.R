@@ -17,7 +17,7 @@ test_that("TODO", {
 
 
   ## MSP Format
-  # nolint start: .msp raw format exemple for development only
+  # nolint start
   c("
     NAME: Ochratoxin B ethyl ester
     PRECURSORMZ: 398.1593

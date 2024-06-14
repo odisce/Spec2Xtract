@@ -38,11 +38,11 @@ get_events_scans <- function(cpd_events, pk_best, index_table) {
     raw_sub <- index_table[
       sub_dt,
       on = c(
-        'msLevel',
-        'spec_energy',
-        'spec_coltype',
-        'spec_polarity',
-        'scanType'
+        "msLevel",
+        "spec_energy",
+        "spec_coltype",
+        "spec_polarity",
+        "scanType"
       )
     ]
     ms2_scan <- raw_sub[
@@ -103,7 +103,6 @@ add_events_to_extract <- function(annobject, debug = FALSE) {
     if (isTRUE(debug)) {
       message("cpd: ", i, " file: ", appendLF = FALSE)
     }
-    # annobject$cpd[[i]]
     output_dt <- data.table()
     for (filei in annobject$cpd[[i]]$Peaks$FileIndex) {
       if (isTRUE(debug)) {
