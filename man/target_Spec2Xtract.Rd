@@ -13,7 +13,9 @@ target_Spec2Xtract(
   minscan = 3,
   rt_limit = 1,
   filter_irel = 0,
+  filter_isopurity = 0,
   ppm = 3,
+  one_msp_file = TRUE,
   resources = targets::tar_option_get("resources")
 )
 }
@@ -37,8 +39,19 @@ inside a peak to keep it}
 
 \item{filter_irel}{Filter ions based on relative intensity}
 
+\item{filter_isopurity}{Filter ions based on the isolation purity (from 0 to 100)}
+
 \item{ppm}{mass deviation for elemental composition
 search in ppm}
+
+\item{one_msp_file}{Boolean to combine all spectra to one unique .msp file \code{TRUE} or to
+separate files \code{FALSE}}
+
+\item{resources}{Object returned by \code{tar_resources()}
+with optional settings for high-performance computing
+functionality, alternative data storage formats,
+and other optional capabilities of \code{targets}.
+See \code{tar_resources()} for details.}
 }
 \value{
 A list of targets objects.

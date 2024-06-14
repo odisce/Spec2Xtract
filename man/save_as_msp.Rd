@@ -7,13 +7,16 @@
 save_as_msp(spectra_dt, spectra_info, cpd_info, file_out)
 }
 \arguments{
-\item{spectra_dt}{Spectrum as data.table}
+\item{spectra_dt}{Spectrum as data.table with columns
+(mz, irel, formula)}
 
 \item{spectra_info}{Spectrum info to add}
 
 \item{cpd_info}{Compound info to add}
 
-\item{file_out}{Output path \verb{/path/to/file.msp}}
+\item{file_out}{Output path (example: \verb{/path/to/file.msp})
+if \code{NULL} the function will return a list with the file
+content.}
 }
 \value{
 Save the .msp file to the file_out directory and

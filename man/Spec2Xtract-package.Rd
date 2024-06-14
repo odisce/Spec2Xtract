@@ -6,7 +6,7 @@
 \alias{Spec2Xtract-package}
 \title{Spec2Xtract: Extract MS2 spectra from LC-MS}
 \description{
-Extract MS2 spectra from .raw Thermo files acquired in LC-MS/MS using the rawrr package, control chromatogram and spectral quality and return the MS2 spectra in different format (table, msp, mzml).
+Extract MS2 spectra from .raw Thermo files acquired in LC-MS/MS using the rawrr package, control chromatogram and spectral quality and return the MS2 spectra in different format (table, msp).
 }
 \author{
 \strong{Maintainer}: Sylvain Dechaumet \email{sylvain.dechaumet@cea.fr}

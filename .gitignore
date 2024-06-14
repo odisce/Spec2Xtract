@@ -2,3 +2,7 @@
 .Rprofile
 .RData
 *_DEV*
+_targets*
+report*
+*Rout
+test-dev*

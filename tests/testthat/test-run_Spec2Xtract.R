@@ -8,17 +8,16 @@ test_that(
         "samplefile.raw"
       )
     )
+    cpd_path <- normalizePath(
+      file.path(
+        testthat::test_path(),
+        "testdata",
+        "cpd.xlsx"
+      )
+    )
     targets::tar_dir({
       eval(substitute({
-        path_data <- "./data"
-        cpd_path <- file.path(path_data, "cpd.xlsx")
-        dir.create(path_data)
-        openxlsx::write.xlsx(
-          Spec2Xtract:::example_cpdlist_realdt,
-          cpd_path
-        )
-
-        Spec2Xtract::run_Spec2Xtract(
+        run_Spec2Xtract(
           files_dir = dirname(raw_path),
           cpd_path = cpd_path,
           firstevent = TRUE,
@@ -57,8 +56,10 @@ test_that(
         testthat::expect_true(any(grepl("EventSummary", exported_files)))
         testthat::expect_true(any(grepl("Summary", exported_files)))
       },
-      env = list(raw_path = raw_path))
-      )
+      env = list(
+        raw_path = raw_path,
+        cpd_path = cpd_path
+      )))
     })
   }
 )

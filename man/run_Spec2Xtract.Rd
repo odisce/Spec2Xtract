@@ -7,13 +7,15 @@
 run_Spec2Xtract(
   files_dir,
   cpd_path,
-  firstevent,
-  prec_ppm,
-  minscan,
-  rt_limit,
-  ppm,
+  firstevent = TRUE,
+  prec_ppm = 5,
+  minscan = 3,
+  rt_limit = 0.2,
+  ppm = 5,
   filter_irel = 0,
-  save_dir,
+  filter_isopurity = 0,
+  one_msp_file = TRUE,
+  save_dir = "./report",
   ncore = 1
 )
 }
@@ -37,6 +39,11 @@ inside a peak to keep it}
 search in ppm}
 
 \item{filter_irel}{Filter ions based on relative intensity}
+
+\item{filter_isopurity}{Filter ions based on the isolation purity (from 0 to 100)}
+
+\item{one_msp_file}{Boolean to combine all spectra to one unique .msp file \code{TRUE} or to
+separate files \code{FALSE}}
 
 \item{save_dir}{Directory to save tables}
 

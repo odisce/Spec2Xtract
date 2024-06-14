@@ -1,6 +1,6 @@
 Package: Spec2Xtract
 Title: Extract MS2 spectra from LC-MS
-Version: 0.9.4
+Version: 0.9.6
 Authors@R: 
     c(
       person(given = "Sylvain", family = "Dechaumet", email = "sylvain.dechaumet@cea.fr", role = c("aut", "cre")),
@@ -12,7 +12,7 @@ Authors@R:
     )
 Description: Extract MS2 spectra from .raw Thermo files acquired in LC-MS/MS using the rawrr package,
     control chromatogram and spectral quality and return the MS2 spectra in different format
-    (table, msp, mzml).
+    (table, msp).
 License: file LICENSE
 Depends:
     R (>= 4.0.0)

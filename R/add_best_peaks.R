@@ -33,11 +33,11 @@ get_peak_scores <- function(
       (1 / diff_from_ref * 2),
       peak_in_range * 3,
       ifelse(scan_nb < 6, scan_nb, 10),
-        ifelse(sn > 100, 10,
-          ifelse(sn > 50, 5,
-            ifelse(sn > 10, 10, 1)
-          )
+      ifelse(sn > 100, 10,
+        ifelse(sn > 50, 5,
+          ifelse(sn > 10, 10, 1)
         )
+      )
     ) %>%
       na.omit() %>%
       sum(),
@@ -116,10 +116,10 @@ get_peak_range <- function(xic, direction = c("R", "L"), peak_sel_center) {
     output <- switch(
       direction,
       "R" = {
-        temp_side[i_n >= 0, ][, min(scan)-1]
+        temp_side[i_n >= 0, ][, min(scan) - 1]
       },
       "L" = {
-        temp_side[i_n >= 0, ][, max(scan)+1]
+        temp_side[i_n >= 0, ][, max(scan) + 1]
       },
       stop("direction arg not one of 'L' or 'R'")
     )
@@ -206,7 +206,6 @@ detect_centwave_peaks <- function(
           peak_info$majorPeakInfo$peakSNR[[peak_sel_name]]
         ## Find rt boundaries
         xcoefs_num <- as.numeric(colnames(peak_info$wCoefs))
-        
         ## using scales or true xics
         if (limits == "xic") {
           peak_scale_trace <- vecint
@@ -218,14 +217,11 @@ detect_centwave_peaks <- function(
           stop("limits argument not recognized, should be one of 'xic' or 'scales'")
         }
 
-
         peak_scale_trace_dt <- data.table(
           "scan" = seq_len(length(peak_scale_trace)),
           "i" = peak_scale_trace
         )
 
-        # peak_scale_trace_dt[, i_n := i - shift(i, 1)]
-        # peak_scale_trace_dt[, i_p := i - shift(i, -1)]
         scmin <- get_peak_range(
           peak_scale_trace_dt,
           "L",
