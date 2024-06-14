@@ -34,23 +34,26 @@ test_that(
           ## Run pipeline
           targets::tar_make()
           ## Run tests
-          targets::tar_read_raw("SUMMARY_dt") %>% {
-            testthat::expect_true(
-              is.data.table(.)
-            )
-          }
+          targets::tar_read_raw("SUMMARY_dt") %>%
+            {
+              testthat::expect_true(
+                is.data.table(.)
+              )
+            }
 
-          targets::tar_read_raw("SUMMARYEVENT_dt") %>% {
-            testthat::expect_true(
-              is.data.table(.)
-            )
-          }
+          targets::tar_read_raw("SUMMARYEVENT_dt") %>%
+            {
+              testthat::expect_true(
+                is.data.table(.)
+              )
+            }
 
-          targets::tar_read_raw("ISOPURITY") %>% {
-            testthat::expect_true(
-              is.list(.)
-            )
-          }
+          targets::tar_read_raw("ISOPURITY") %>%
+            {
+              testthat::expect_true(
+                is.list(.)
+              )
+            }
 
           exported_files <- list.files("./report", recursive = TRUE)
           expect_true(any(grepl("CPD1", exported_files)))
@@ -107,13 +110,16 @@ testthat::test_that(
           ## Run pipeline
           targets::tar_make()
           ## Run tests
-          targets::tar_read_raw("SPECTRA_DB") %>% {
+          targets::tar_read_raw("SPECTRA_DB") %>%
+            {
               .$spectra_db
-            } %>% {
+            } %>%
+            {
               sapply(., function(x) {
                 max(x$irel) >= filter_irel
               })
-            } %>% {
+            } %>%
+            {
               testthat::expect_true(
                 all(.)
               )
@@ -124,26 +130,27 @@ testthat::test_that(
           ## Check that all exported files are with an isopurity above threshold
           event_noto_export <- targets::tar_read_raw("SUMMARYEVENT_dt") %>% {
             .[isopurity < filter_isopurity, SpecID]
-          } %>% {
-            sapply(
-              .,
-              function(x) {
-                any(grepl(x, grep("(xlsx|msp)$", exported_files, value = TRUE)))
-              }
-            )
-          }
+          } %>%
+            {
+              sapply(
+                .,
+                function(x) {
+                  any(grepl(x, grep("(xlsx|msp)$", exported_files, value = TRUE)))
+                }
+              )
+            }
           testthat::expect_true(all(!event_noto_export))
-          
           event_to_export <- targets::tar_read_raw("SUMMARYEVENT_dt") %>% {
             .[isopurity >= filter_isopurity, SpecID]
-          } %>% {
-            sapply(
-              .,
-              function(x) {
-                any(grepl(x, grep("(xlsx|msp)$", exported_files, value = TRUE)))
-              }
-            )
-          }
+          } %>%
+            {
+              sapply(
+                .,
+                function(x) {
+                  any(grepl(x, grep("(xlsx|msp)$", exported_files, value = TRUE)))
+                }
+              )
+            }
           testthat::expect_true(all(event_to_export))
         },
         env = list(

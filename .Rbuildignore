@@ -7,3 +7,6 @@
 ^data-raw$
 .dev.
 .lintr
+_targets*
+.*.Rout
+report/*

@@ -2,10 +2,8 @@
 #'
 #' @param filter_irel Filter ions based on relative intensity
 #' @param filter_isopurity Filter ions based on the isolation purity (from 0 to 100)
-##' @param search_adduct Boolean to search for adducts
-##' @param search_losses Boolean to search for losses
-##' @param search_multimers Boolean to search for multimers
-##' @param search_isotopes Boolean to search for isotopes
+#' @param one_msp_file Boolean to combine all spectra to one unique .msp file `TRUE` or to
+#' separate files `FALSE`
 #' @inheritParams init_object
 #' @inheritParams add_events
 #' @inheritParams add_cpd_events
@@ -57,10 +55,7 @@ target_Spec2Xtract <- function(
   filter_irel = 0,
   filter_isopurity = 0,
   ppm = 3,
-  search_adduct = FALSE,
-  search_losses = FALSE,
-  search_multimers = FALSE,
-  search_isotopes = FALSE,
+  one_msp_file = TRUE,
   resources = targets::tar_option_get("resources")
 ) {
   list(
@@ -90,10 +85,11 @@ target_Spec2Xtract <- function(
       "CPD_INFO_dt",
       substitute({
         temp <- fun_check_cpd(CPD_IN)
-        temp <- Spec2Xtract::cpd_add_ionsmass(temp)
+        temp <- cpd_add_ionsmass(temp)
         return(temp[])
       }),
-      deployment = "main"
+      deployment = "main",
+      packages = c("Spec2Xtract")
     ),
     ## Get Files Index ----
     tar_target_raw(
@@ -218,22 +214,22 @@ target_Spec2Xtract <- function(
                 mz_in_range <- lapply(
                   seq_len(nrow(comp_grid)),
                   function(y) {
-                    A <- x[comp_grid[y, 1], spec_prec]
-                    B <- x[comp_grid[y, 2], spec_prec]
+                    spec_prec_a <- x[comp_grid[y, 1], spec_prec]
+                    spec_prec_b <- x[comp_grid[y, 2], spec_prec]
                     iso_win <- mean(
                       c(
                         x[comp_grid[y, 1], isolation_window],
                         x[comp_grid[y, 2], isolation_window]
                       ), na.rm = TRUE
                     )
-                    AB <- abs(A - B)
+                    spec_prec_ab <- abs(spec_prec_a - spec_prec_b)
                     out <- data.table(
-                      "A" = A,
-                      "B" = B,
-                      "AB" = AB
+                      "A" = spec_prec_a,
+                      "B" = spec_prec_b,
+                      "AB" = spec_prec_ab
                     )
 
-                    if (AB <= iso_win * 0.01) {
+                    if (spec_prec_ab <= iso_win * 0.01) {
                       out[, diffok := TRUE]
                     } else {
                       out[, diffok := FALSE]
@@ -247,7 +243,8 @@ target_Spec2Xtract <- function(
                   grpi_dt <- igraph::graph_from_data_frame(
                     mz_in_range[diffok == TRUE, ]
                   ) %>%
-                    igraph::components() %>% {
+                    igraph::components() %>%
+                    {
                       as.data.table(
                         .$membership,
                         keep.rownames = TRUE
@@ -577,8 +574,7 @@ target_Spec2Xtract <- function(
           return(NULL)
         }
         ## Calculate purity on MS1
-        
-        .SD <- MSSPECTRA_COMB$spectra_info_dt[SpecID == "CPD01_File06_SPEC015",]
+        .SD <- MSSPECTRA_COMB$spectra_info_dt[SpecID == "CPD01_File06_SPEC015", ]
         CpdIndex <- .SD[, unique(CpdIndex)]
         SpectrumIndex <- .SD[, unique(SpectrumIndex)]
 
@@ -687,7 +683,8 @@ target_Spec2Xtract <- function(
             }
           }
         ) %>%
-          rbindlist() %>% {
+          rbindlist() %>%
+          {
             .[, .(CpdIndex, FileIndex, rtmin, rtmax, rt)]
           }
         return(peaks_dt)
@@ -858,14 +855,15 @@ target_Spec2Xtract <- function(
             by = "CpdIndex",
             all = TRUE
           )
-        } %>% {
-          merge(
-            .,
-            F_INFO_dt[, .(FileIndex, file_name)],
-            by = "FileIndex",
-            all.x = TRUE
-          )
-        }
+        } %>%
+          {
+            merge(
+              .,
+              F_INFO_dt[, .(FileIndex, file_name)],
+              by = "FileIndex",
+              all.x = TRUE
+            )
+          }
 
         return(output)
       }),
@@ -936,6 +934,7 @@ target_Spec2Xtract <- function(
             "Spectra_dir_msp" = file.path(save_dir, "spectra", "msp"),
             "Spectra_dir_xlsx" = file.path(save_dir, "spectra", "xlsx")
           )
+          save_l <- lapply(save_l, normalizePath)
 
           save_l[grepl("dir", names(save_l))] %>% {
             sapply(., function(x) {
@@ -983,14 +982,28 @@ target_Spec2Xtract <- function(
                 )
                 ## Save msp
                 save_path <- file.path(save_l$Spectra_dir_msp, paste0(spectra_info_i$SpecID, ".msp"))
+                if (isTRUE(one_msp_file)) {
+                  file_out <- NULL
+                } else {
+                  file_out <- save_path
+                }
                 temp <- save_as_msp(
                   spectra_dt = spec_out,
                   spectra_info = spectra_info_i,
                   cpd_info = CPD_INFO_dt[CpdIndex == spectra_info_i$CpdIndex, ],
-                  file_out = save_path
+                  file_out = file_out
                 )
+                return(temp)
               }
             )
+            ## Write one msp
+            if (isTRUE(one_msp_file)) {
+              write_file(
+                string = temp,
+                file_path = file.path(save_l$Spectra_dir_msp, "library.msp") %>% normalizePath(),
+                overwrite = TRUE
+              )
+            }
           }
           return(TRUE)
         }
@@ -1074,7 +1087,7 @@ target_Spec2Xtract <- function(
           ) +
           geom_linerange(
             aes(
-              ymin = 0, 
+              ymin = 0,
               ymax = irel
             )
           ) +
@@ -1124,7 +1137,6 @@ target_Spec2Xtract <- function(
               "ID: ", spectra_info_i$SpecID
             )
           )
-        
         new_x <- c(
           spectra_i[, mz],
           as.numeric(spectra_info_i$spec_precmz) + c(-2, +2)
@@ -1165,14 +1177,15 @@ target_Spec2Xtract <- function(
 run_Spec2Xtract <- function(
   files_dir,
   cpd_path,
-  firstevent,
-  prec_ppm,
-  minscan,
-  rt_limit,
-  ppm,
-  filter_irel,
-  filter_isopurity,
-  save_dir,
+  firstevent = TRUE,
+  prec_ppm = 5,
+  minscan = 3,
+  rt_limit = 0.2,
+  ppm = 5,
+  filter_irel = 0,
+  filter_isopurity = 0,
+  one_msp_file = TRUE,
+  save_dir = "./report",
   ncore = 1
 ) {
   dir.create(save_dir)
@@ -1196,8 +1209,11 @@ run_Spec2Xtract <- function(
               cpd_dt <- data.table::fread(cpd_path)
             }
 
+            library("Spec2Xtract")
+
             targets::tar_option_set(
-              packages = c("data.table", "magrittr", "Spec2Xtract")
+              packages = c("data.table", "magrittr", "Spec2Xtract"),
+              error = "continue"
             )
 
             if (ncore > 1) {
@@ -1226,11 +1242,13 @@ run_Spec2Xtract <- function(
                 ppm = ppm,
                 save_dir = save_dir,
                 filter_irel = filter_irel,
-                filter_isopurity = filter_isopurity
+                filter_isopurity = filter_isopurity,
+                one_msp_file = one_msp_file
               )
             )
           },
-          ask = FALSE
+          ask = FALSE,
+          library_targets = TRUE
         )
       },
       list(
@@ -1243,7 +1261,8 @@ run_Spec2Xtract <- function(
         ppm = eval(ppm),
         save_dir = eval(save_dir),
         ncore = eval(ncore),
-        filter_irel = eval(filter_irel)
+        filter_irel = eval(filter_irel),
+        one_msp_file = eval(one_msp_file)
       )
     )
   )

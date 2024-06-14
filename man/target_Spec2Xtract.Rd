@@ -15,10 +15,7 @@ target_Spec2Xtract(
   filter_irel = 0,
   filter_isopurity = 0,
   ppm = 3,
-  search_adduct = FALSE,
-  search_losses = FALSE,
-  search_multimers = FALSE,
-  search_isotopes = FALSE,
+  one_msp_file = TRUE,
   resources = targets::tar_option_get("resources")
 )
 }
@@ -47,13 +44,8 @@ inside a peak to keep it}
 \item{ppm}{mass deviation for elemental composition
 search in ppm}
 
-\item{search_adduct}{Boolean to search for adducts}
-
-\item{search_losses}{Boolean to search for losses}
-
-\item{search_multimers}{Boolean to search for multimers}
-
-\item{search_isotopes}{Boolean to search for isotopes}
+\item{one_msp_file}{Boolean to combine all spectra to one unique .msp file \code{TRUE} or to
+separate files \code{FALSE}}
 
 \item{resources}{Object returned by \code{tar_resources()}
 with optional settings for high-performance computing
