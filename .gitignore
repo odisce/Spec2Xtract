@@ -2,3 +2,5 @@
 .Rprofile
 .RData
 *_DEV*
+_targets*
+report*

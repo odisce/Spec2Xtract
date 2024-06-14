@@ -1,6 +1,11 @@
 #' targets factory to extract MS2 spectra
 #'
 #' @param filter_irel Filter ions based on relative intensity
+#' @param filter_isopurity Filter ions based on the isolation purity (from 0 to 100)
+##' @param search_adduct Boolean to search for adducts
+##' @param search_losses Boolean to search for losses
+##' @param search_multimers Boolean to search for multimers
+##' @param search_isotopes Boolean to search for isotopes
 #' @inheritParams init_object
 #' @inheritParams add_events
 #' @inheritParams add_cpd_events
@@ -50,7 +55,12 @@ target_Spec2Xtract <- function(
   minscan = 3,
   rt_limit = 1,
   filter_irel = 0,
+  filter_isopurity = 0,
   ppm = 3,
+  search_adduct = FALSE,
+  search_losses = FALSE,
+  search_multimers = FALSE,
+  search_isotopes = FALSE,
   resources = targets::tar_option_get("resources")
 ) {
   list(
@@ -78,7 +88,7 @@ target_Spec2Xtract <- function(
     ),
     tar_target_raw(
       "CPD_INFO_dt",
-      quote({
+      substitute({
         temp <- fun_check_cpd(CPD_IN)
         temp <- Spec2Xtract::cpd_add_ionsmass(temp)
         return(temp[])
@@ -867,6 +877,7 @@ target_Spec2Xtract <- function(
       "SPECTRA_DB", substitute(
         {
           if (!is.null(ISOPURITY)) {
+            filter_irel_i <- filter_irel
             spectra_msn_info <- ISOPURITY$spectra_info_dt[msLevel > 1, ]
             output <- lapply(
               seq_len(spectra_msn_info[, .N]),
@@ -890,7 +901,7 @@ target_Spec2Xtract <- function(
                 new_colorder <- intersect(new_colorder, names(spec_out))
                 setcolorder(spec_out, new_colorder)
                 spec_out[, SpectrumIndex := SpectrumIndex_i]
-                return(spec_out[irel >= filter_irel, ])
+                return(spec_out[irel >= filter_irel_i, ])
               }
             ) %>%
               rbindlist(., fill = TRUE)
@@ -903,7 +914,7 @@ target_Spec2Xtract <- function(
           }
         }
       ),
-      deployment = 'main',
+      deployment = "main",
       packages = c("data.table", "magrittr", "Spec2Xtract", "Spec2Annot")
     ),
 
@@ -948,7 +959,19 @@ target_Spec2Xtract <- function(
               SPECTRA_DB$spectra_info_dt[, seq_len(.N)],
               function(x) {
                 spectra_info_i <- SPECTRA_DB$spectra_info_dt[x, ]
-                # spec_out <- SPECTRA_DB$spectra_db[[x]]
+                if (spectra_info_i$isopurity < filter_isopurity) {
+                  message(
+                    paste0(
+                      "Spectra: ", spectra_info_i$SpecID,
+                      " is discarded: isolation purity < to filter_isopurity (",
+                      sprintf("%0.2f", spectra_info_i$isopurity),
+                      " < ",
+                      filter_isopurity,
+                      ")"
+                    )
+                  )
+                  return(NULL)
+                }
                 spec_ind <- which(names(SPECTRA_DB$spectra_db) == as.character(spectra_info_i$SpectrumIndex))
                 spec_out <- SPECTRA_DB$spectra_db[[spec_ind]]
                 ## Save xlsx
@@ -1147,7 +1170,8 @@ run_Spec2Xtract <- function(
   minscan,
   rt_limit,
   ppm,
-  filter_irel = 0,
+  filter_irel,
+  filter_isopurity,
   save_dir,
   ncore = 1
 ) {
@@ -1201,7 +1225,8 @@ run_Spec2Xtract <- function(
                 rt_limit = rt_limit,
                 ppm = ppm,
                 save_dir = save_dir,
-                filter_irel = filter_irel
+                filter_irel = filter_irel,
+                filter_isopurity = filter_isopurity
               )
             )
           },

@@ -13,7 +13,12 @@ target_Spec2Xtract(
   minscan = 3,
   rt_limit = 1,
   filter_irel = 0,
+  filter_isopurity = 0,
   ppm = 3,
+  search_adduct = FALSE,
+  search_losses = FALSE,
+  search_multimers = FALSE,
+  search_isotopes = FALSE,
   resources = targets::tar_option_get("resources")
 )
 }
@@ -37,8 +42,24 @@ inside a peak to keep it}
 
 \item{filter_irel}{Filter ions based on relative intensity}
 
+\item{filter_isopurity}{Filter ions based on the isolation purity (from 0 to 100)}
+
 \item{ppm}{mass deviation for elemental composition
 search in ppm}
+
+\item{search_adduct}{Boolean to search for adducts}
+
+\item{search_losses}{Boolean to search for losses}
+
+\item{search_multimers}{Boolean to search for multimers}
+
+\item{search_isotopes}{Boolean to search for isotopes}
+
+\item{resources}{Object returned by \code{tar_resources()}
+with optional settings for high-performance computing
+functionality, alternative data storage formats,
+and other optional capabilities of \code{targets}.
+See \code{tar_resources()} for details.}
 }
 \value{
 A list of targets objects.

@@ -61,6 +61,7 @@ Spec2Xtract::run_Spec2Xtract(
   ppm = 6,
   save_dir = "./report",
   filter_irel = 0.01,
+  filter_isopurity = 10,
   ncore = 1
 )
 ```

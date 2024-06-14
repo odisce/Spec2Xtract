@@ -13,6 +13,7 @@ run_Spec2Xtract(
   rt_limit,
   ppm,
   filter_irel = 0,
+  filter_isopurity = 0,
   save_dir,
   ncore = 1
 )
@@ -37,6 +38,8 @@ inside a peak to keep it}
 search in ppm}
 
 \item{filter_irel}{Filter ions based on relative intensity}
+
+\item{filter_isopurity}{Filter ions based on the isolation purity (from 0 to 100)}
 
 \item{save_dir}{Directory to save tables}
 
