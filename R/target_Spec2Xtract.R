@@ -1262,6 +1262,7 @@ run_Spec2Xtract <- function(
         save_dir = eval(save_dir),
         ncore = eval(ncore),
         filter_irel = eval(filter_irel),
+        filter_isopurity = eval(filter_isopurity),
         one_msp_file = eval(one_msp_file)
       )
     )
