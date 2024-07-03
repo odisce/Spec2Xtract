@@ -15,7 +15,7 @@ RUN apt-get update && \
 
 workdir Spec2Xtract/ # mkdir Spec2Xtract && cd Spec2Xtract/
 COPY . .
-RUN rm .Rprofile
+RUN rm -f .Rprofile
 
 RUN R --no-save -e 'install.packages("renv") ; renv::activate()'
 RUN R --no-save -e 'options(renv.config.pak.enabled=TRUE) ; renv::restore(prompt = FALSE) ; renv::install(".")'
