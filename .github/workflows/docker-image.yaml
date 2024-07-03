@@ -24,7 +24,7 @@ jobs:
         run: |
           PK_VERSION="$(sh -c 'shyaml get-value Version < "DESCRIPTION"')"
           echo $PK_VERSION
-          PK_NAME="$(sh -c 'shyaml get-value Package < "DESCRIPTION"')"| tr '[:upper:]' '[:lower:]'
+          PK_NAME="$(sh -c 'shyaml get-value Package < "DESCRIPTION"')" | tr '[:upper:]' '[:lower:]'
           echo $PK_NAME
           TAG="${DOCKER_REG}/${PK_NAME}:${PK_VERSION}"
           echo $TAG
