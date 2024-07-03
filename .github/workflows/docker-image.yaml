@@ -37,4 +37,4 @@ jobs:
         with:
           file: inst/dockerfile/dockerfile
           push: true
-          tags: odisce/spec2xtract:${{ needs.get_package_version.pk_version.outputs.stdout }}
+          tags: odisce/spec2xtract:latest
