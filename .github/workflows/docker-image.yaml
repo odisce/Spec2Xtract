@@ -13,12 +13,14 @@ jobs:
     container:
       image: nightio/shyaml:1.0.3
     outputs:
-      output1: ${{ steps.pk_version.outputs.stdout }}
+      output1: ${{ steps.pk_version.outputs.tag }}
     steps:
       - uses: actions/checkout@v3
       - name: Get package version
         id: pk_version
-        run: sh -c 'shyaml get-value Version < "DESCRIPTION"'
+        run: |
+          PK_VERSION="$(sh -c 'shyaml get-value Version < "DESCRIPTION"')"
+          echo "tag='odsice/spec2xtract:'${X}" >> "$GITHUB_OUTPUT"
 
   push_to_registry:
     name: push docker image to hub
@@ -39,4 +41,4 @@ jobs:
         with:
           file: inst/docker/dockerfile
           push: true
-          tags: odisce/spec2xtract:${{ needs.get_package_version.pk_version.outputs.output1 }}
+          tags: ${{ needs.get_package_version.pk_version.outputs.output1 }}
