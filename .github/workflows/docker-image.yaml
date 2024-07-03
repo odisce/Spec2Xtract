@@ -25,11 +25,11 @@ jobs:
           username: ${{secrets.DOCKERHUB_USERNAME}}
           password: ${{secrets.DOCKERHUB_TOKEN}}
 
-    - name: Extract metadata for the Docker image
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - name: Extract metadata for the Docker image
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - name: build and push docker image to registry
         uses: docker/build-push-action@v5
