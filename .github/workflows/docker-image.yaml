@@ -7,7 +7,7 @@ on:
 name: Build and Push Docker Image to Docker Hub
 
 env:
-  DOCKER_REG: ${{secrets.DOCKERHUB_USERNAME}}
+  DOCKER_REG: odisce
 
 jobs:
   get_package_version:
