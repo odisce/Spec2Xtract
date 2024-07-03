@@ -24,8 +24,8 @@ jobs:
         run: |
           PK_VERSION="$(sh -c 'shyaml get-value Version < "DESCRIPTION"')"
           PK_NAME="$(sh -c 'shyaml get-value Package < "DESCRIPTION"')"| tr '[:upper:]' '[:lower:]' 
-          echo "${DOCKER_REG}'/'${PK_NAME}':'${PK_VERSION}"
-          echo "tag=${DOCKER_REG}'/'${PK_NAME}':'${PK_VERSION}" >> "$GITHUB_OUTPUT"
+          TAG="${DOCKER_REG}/${PK_NAME}:${PK_VERSION}"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
   # push_to_registry:
   #     name: push docker image to hub
   #     runs-on: ubuntu-latest
