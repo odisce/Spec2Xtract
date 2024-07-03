@@ -45,9 +45,12 @@ jobs:
             username: ${{secrets.DOCKERHUB_USERNAME}}
             password: ${{secrets.DOCKERHUB_TOKEN}}
 
-        - name: build and push docker image to registry
-          uses: docker/build-push-action@v5
-          with:
-            file: inst/docker/dockerfile
-            push: true
-            tags: ${{needs.get_package_version.outputs.output1}}
+        - name: test
+          run: ${{ needs.get_package_version.outputs.output1 }}
+
+        # - name: build and push docker image to registry
+        #   uses: docker/build-push-action@v5
+        #   with:
+        #     file: inst/docker/dockerfile
+        #     push: true
+        #     tags: ${{needs.get_package_version.outputs.output1}}
