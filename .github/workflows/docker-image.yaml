@@ -35,6 +35,6 @@ jobs:
       - name: build and push docker image to registry
         uses: docker/build-push-action@v5
         with:
-          file: inst/dockerfile/dockerfile
+          file: inst/docker/dockerfile
           push: true
           tags: odisce/spec2xtract:latest
