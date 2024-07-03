@@ -15,9 +15,7 @@ jobs:
     steps:
       - name: Get package version
         id: pk_version
-        with:
-          run: |
-            sh -c 'shyaml get-value Version < "DESCRIPTION"'
+        run: sh -c 'shyaml get-value Version < "DESCRIPTION"'
 
   push_to_registry:
     name: push docker image to hub
