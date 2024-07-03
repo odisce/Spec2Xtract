@@ -1,0 +1,21 @@
+FROM r-base:4.3.2
+
+MAINTAINER Sylvain Dechaumet <sylvain.dechaumet@cea.fr>
+
+RUN apt-get update && \
+  apt-get install -y \
+    git \
+    curl \
+    libfontconfig1-dev \
+    git \
+    libcurl4-openssl-dev \
+    libmbedtls-dev \
+    make \
+    mono-runtime
+
+workdir Spec2Xtract/ # mkdir Spec2Xtract && cd Spec2Xtract/
+COPY . .
+RUN rm .Rprofile
+
+RUN R --no-save -e 'install.packages("renv") ; renv::activate()'
+RUN R --no-save -e 'options(renv.config.pak.enabled=TRUE) ; renv::restore(prompt = FALSE) ; renv::install(".")'
