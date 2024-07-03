@@ -20,7 +20,7 @@ jobs:
         id: pk_version
         run: |
           PK_VERSION="$(sh -c 'shyaml get-value Version < "DESCRIPTION"')"
-          tag='odsice/spec2xtract:'${PK_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag='odsice/spec2xtract:'${PK_VERSION}" >> "$GITHUB_OUTPUT"
           echo $tag
 
   push_to_registry:
