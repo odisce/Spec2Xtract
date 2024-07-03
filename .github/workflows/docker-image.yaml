@@ -50,4 +50,4 @@ jobs:
           with:
             file: inst/docker/dockerfile
             push: true
-            tags: ${{ needs.get_package_version.outputs.output1 }}
+            tags: ${{needs.get_package_version.outputs.output1}}
