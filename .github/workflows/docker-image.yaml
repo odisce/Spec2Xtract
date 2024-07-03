@@ -1,6 +1,11 @@
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
 name: Build and Push Docker Image to Docker Hub
 
-on: push
 jobs:
   push_to_registry:
     name: push docker image to hub
@@ -11,7 +16,7 @@ jobs:
 
       - name: Get package version
         id: pk_version
-        uses: nightio/shyaml:1.0.3
+        uses: nightio/shyaml@1.0.3
         with:
           run: |
             sh -c 'shyaml get-value Version < "DESCRIPTION"'
