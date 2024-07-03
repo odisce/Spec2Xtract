@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: nightio/shyaml:1.0.3
+    outputs:
+      output1: ${{ steps.pk_version.outputs.stdout }}
     steps:
       - uses: actions/checkout@v3
       - name: Get package version
@@ -37,4 +39,4 @@ jobs:
         with:
           file: inst/docker/dockerfile
           push: true
-          tags: odisce/spec2xtract:latest
+          tags: odisce/spec2xtract:${{ needs.get_package_version.pk_version.outputs.output1 }}
