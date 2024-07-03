@@ -30,7 +30,7 @@ jobs:
           echo $PK_NAME_LOW
           TAG="${DOCKER_REG}/${PK_NAME_LOW}:${PK_VERSION}"
           echo $TAG
-          echo "tag=echo $TAG" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
   push_to_registry:
       name: push docker image to hub
       runs-on: ubuntu-latest
