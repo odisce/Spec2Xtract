@@ -31,23 +31,23 @@ jobs:
           TAG="${DOCKER_REG}/${PK_NAME_LOW}:${PK_VERSION}"
           echo $TAG
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-  # push_to_registry:
-  #     name: push docker image to hub
-  #     runs-on: ubuntu-latest
-  #     needs: get_package_version
-  #     steps:
-  #       - name: check repository
-  #         uses: actions/checkout@v4
+  push_to_registry:
+      name: push docker image to hub
+      runs-on: ubuntu-latest
+      needs: get_package_version
+      steps:
+        - name: check repository
+          uses: actions/checkout@v4
 
-  #       - name: login to docker registry
-  #         uses: docker/login-action@v3
-  #         with:
-  #           username: ${{secrets.DOCKERHUB_USERNAME}}
-  #           password: ${{secrets.DOCKERHUB_TOKEN}}
+        - name: login to docker registry
+          uses: docker/login-action@v3
+          with:
+            username: ${{secrets.DOCKERHUB_USERNAME}}
+            password: ${{secrets.DOCKERHUB_TOKEN}}
 
-  #       - name: build and push docker image to registry
-  #         uses: docker/build-push-action@v5
-  #         with:
-  #           file: inst/docker/dockerfile
-  #           push: true
-  #           tags: ${{ needs.get_package_version.outputs.output1 }}
+        - name: build and push docker image to registry
+          uses: docker/build-push-action@v5
+          with:
+            file: inst/docker/dockerfile
+            push: true
+            tags: ${{ needs.get_package_version.outputs.output1 }}
