@@ -25,7 +25,6 @@ jobs:
         run: |
           PK_VERSION="$(sh -c 'shyaml get-value Version < "DESCRIPTION"')"
           echo "tag='odsice/spec2xtract:'${X}" >> "$GITHUB_OUTPUT"
-jobs:
   echo_version:
     name: paste version
     runs-on: ubuntu-latest
