@@ -14,7 +14,6 @@ jobs:
   push_to_registry:
     name: push docker image to hub
     runs-on: ubuntu-latest
-    needs: get_package_version
     steps:
       - name: check repository
         uses: actions/checkout@v4
