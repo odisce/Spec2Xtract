@@ -7,19 +7,25 @@ on:
 name: Build and Push Docker Image to Docker Hub
 
 jobs:
-  push_to_registry:
-    name: push docker image to hub
+  get_package_version:
+    name: get package version
     runs-on: ubuntu-latest
+    container:
+      image: nightio/shyaml:1.0.3
     steps:
-      - name: check repository
-        uses: actions/checkout@v4
-
       - name: Get package version
         id: pk_version
-        uses: nightio/shyaml@1.0.3
         with:
           run: |
             sh -c 'shyaml get-value Version < "DESCRIPTION"'
+
+  push_to_registry:
+    name: push docker image to hub
+    runs-on: ubuntu-latest
+    needs: get_package_version
+    steps:
+      - name: check repository
+        uses: actions/checkout@v4
 
       - name: login to docker registry
         uses: docker/login-action@v3
@@ -32,4 +38,4 @@ jobs:
         with:
           file: inst/dockerfile/dockerfile
           push: true
-          tags: odisce/spec2xtract:${{ steps.pk_version.outputs.stdout }}
+          tags: odisce/spec2xtract:${{ needs.get_package_version.pk_version.outputs.stdout }}
