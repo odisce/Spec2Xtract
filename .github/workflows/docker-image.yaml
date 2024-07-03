@@ -6,23 +6,11 @@ on:
 
 name: Build and Push Docker Image to Docker Hub
 
-jobs:
-  get_package_version:
-    name: get package version
-    runs-on: ubuntu-latest
-    container:
-      image: nightio/shyaml:1.0.3
-    outputs:
-      output1: ${{ steps.pk_version.outputs.tag }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Get package version
-        id: pk_version
-        run: |
-          PK_VERSION="$(sh -c 'shyaml get-value Version < "DESCRIPTION"')"
-          echo "tag='odsice/spec2xtract:'${PK_VERSION}" >> "$GITHUB_OUTPUT"
-          echo $tag
+env:
+  REGISTRY: odisce
+  IMAGE_NAME: spec2xtract
 
+jobs:
   push_to_registry:
     name: push docker image to hub
     runs-on: ubuntu-latest
@@ -37,9 +25,15 @@ jobs:
           username: ${{secrets.DOCKERHUB_USERNAME}}
           password: ${{secrets.DOCKERHUB_TOKEN}}
 
+    - name: Extract metadata for the Docker image
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
       - name: build and push docker image to registry
         uses: docker/build-push-action@v5
         with:
           file: inst/docker/dockerfile
           push: true
-          tags: ${{ needs.get_package_version.pk_version.outputs.output1 }}
+          tags: ${{ steps.meta.outputs.tags }}
