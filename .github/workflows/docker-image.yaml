@@ -46,7 +46,7 @@ jobs:
             password: ${{secrets.DOCKERHUB_TOKEN}}
 
         - name: test
-          run: ${{ needs.get_package_version.outputs.output1 }}
+          run: echo ${{ needs.get_package_version.outputs.output1 }}
 
         # - name: build and push docker image to registry
         #   uses: docker/build-push-action@v5
