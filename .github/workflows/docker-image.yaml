@@ -23,7 +23,9 @@ jobs:
         id: pk_version
         run: |
           PK_VERSION="$(sh -c 'shyaml get-value Version < "DESCRIPTION"')"
-          PK_NAME="$(sh -c 'shyaml get-value Package < "DESCRIPTION"')"| tr '[:upper:]' '[:lower:]' 
+          echo $PK_VERSION
+          PK_NAME="$(sh -c 'shyaml get-value Package < "DESCRIPTION"')"| tr '[:upper:]' '[:lower:]'
+          echo $PK_NAME
           TAG="${DOCKER_REG}/${PK_NAME}:${PK_VERSION}"
           echo $TAG
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
