@@ -13,7 +13,7 @@ RUN apt-get update && \
     make \
     mono-runtime
 
-workdir Spec2Xtract/ # mkdir Spec2Xtract && cd Spec2Xtract/
+workdir Spec2Xtract/
 COPY . .
 RUN rm -f .Rprofile
 
