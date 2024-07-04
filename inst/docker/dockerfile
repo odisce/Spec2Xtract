@@ -19,3 +19,4 @@ RUN rm -f .Rprofile
 
 RUN R --no-save -e 'install.packages("renv") ; renv::activate()'
 RUN R --no-save -e 'options(renv.config.pak.enabled=TRUE) ; renv::restore(prompt = FALSE) ; renv::install(".")'
+RUN R CMD BATCH inst/installrawrr.R
