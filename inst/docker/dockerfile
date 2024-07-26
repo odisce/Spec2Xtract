@@ -2,6 +2,10 @@ FROM r-base:4.3.2
 
 MAINTAINER Sylvain Dechaumet <sylvain.dechaumet@cea.fr>
 
+ENV RENV_PATHS_LIBRARY renv/library
+ENV RENV_PATHS_CACHE  renv/cache
+ENV RENV_CONFIG_PAK_ENABLED TRUE
+
 RUN apt-get update && \
   apt-get install -y \
     git \
@@ -16,6 +20,8 @@ RUN apt-get update && \
 workdir Spec2Xtract/
 COPY . .
 RUN rm -f .Rprofile
+RUN mkdir -p /renv/library
+RUN mkdir -p /renv/cache
 
 RUN R --no-save -e 'install.packages("renv") ; renv::activate()'
 RUN R --no-save -e 'options(renv.config.pak.enabled=TRUE) ; renv::restore(prompt = FALSE) ; renv::install(".")'
