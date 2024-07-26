@@ -2,24 +2,26 @@
 % Please edit documentation in R/init_object.R
 \name{parse_index_dt}
 \alias{parse_index_dt}
-\title{Extract ms level and collision type, energy from index}
+\title{Parse the scan index table}
 \usage{
 parse_index_dt(index_table)
 }
 \arguments{
 \item{index_table}{The index table as returned by
-\code{Spec2Xtract::get_rawindex()}}
+\code{\link[=get_rawindex]{get_rawindex()}}}
 }
 \value{
 Add the following columns to \code{index_table}:
 \itemize{
-\item \code{"msLevel"}: Fragmentation level
-\item \code{"spec_energy"}: Collision energy
-\item \code{"spec_coltype"}: Collision type
-\item \code{"spec_polarity"}: Polarity
-\item \code{"spec_prec"}: Precursor m/Z
+\item \code{msLevel}: Fragmentation level
+\item \code{spec_energy}: Collision energy
+\item \code{spec_coltype}: Collision type
+\item \code{spec_polarity}: Polarity
+\item \code{spec_prec}: Precursor m/Z
 }
 }
 \description{
-Extract ms level and collision type, energy from index
+Parse the scan index table to retrieve informations
+on fragmentation levels, collsision energy, polarity,
+etc.
 }

@@ -7,15 +7,17 @@
 get_peaks_xic(xic_mat, minscan = 3, majpeakonly = FALSE)
 }
 \arguments{
-\item{xic_mat}{a matrix or data.table with the following columns:
-- \code{rt} with the retention time
-- \code{i} with the intensities}
+\item{xic_mat}{A \code{matrix} or \code{data.table} with the following columns:
+\itemize{
+\item \code{rt} with the retention time as \code{numeric}
+\item \code{i} with the intensities as \code{numeric}
+}}
 
-\item{minscan}{numeric value for the minimum number of scan
-inside a peak to keep it}
+\item{minscan}{Threshold for the minimum number of scan inside a peak to keep it as \code{integer}.}
 
 \item{majpeakonly}{Logical to extract only the majors peaks (\code{TRUE})
-or all peaks (\code{FALSE}) from MassSpecWavelet}
+or all peaks (\code{FALSE}) with
+\code{\link[MassSpecWavelet]{peakDetectionCWT}}}
 }
 \description{
 Find peaks usint CentWave

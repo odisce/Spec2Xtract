@@ -11,8 +11,7 @@ get_peaks_from_xic(xic_cpd, minscan = 4)
 columns: \code{filter}, \code{EventIndex}, \code{rt}
 \code{i}}
 
-\item{minscan}{numeric value for the minimum number of scan
-inside a peak to keep it}
+\item{minscan}{Threshold for the minimum number of scan inside a peak to keep it as \code{integer}.}
 }
 \description{
 Extract peaks from XICs

@@ -7,7 +7,7 @@
 get_rawindex(rawpath)
 }
 \arguments{
-\item{rawpath}{Path to the .raw file}
+\item{rawpath}{Path to the \code{.raw} file}
 }
 \value{
 Return a data.table with the spectra indexes from \code{rawrr::readIndex}.

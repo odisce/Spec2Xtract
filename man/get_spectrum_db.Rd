@@ -9,7 +9,7 @@ get_spectrum_db(ms_scan_to_get, rawpath)
 \arguments{
 \item{ms_scan_to_get}{scan index of the spectrum to extract}
 
-\item{rawpath}{Path to the .raw file}
+\item{rawpath}{Path to the \code{.raw} file}
 }
 \value{
 Return a list with two levels:

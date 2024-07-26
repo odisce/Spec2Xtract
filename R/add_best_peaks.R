@@ -47,52 +47,17 @@ get_peak_scores <- function(
   return(peaks_dt[])
 }
 
-#' Calculate peak scores
-#'
-#' @param xic_peaks Peak list as returned by
-#'                  `Spec2Xtract::get_peaks_from_xic()`
-#' @param cpd_events Compound MS(n) event slot
-#' @param CpdIndex (optional) Compound iteration ID to use
-#' @param cpd_info Compound Info slot or reference rt in minute
-#' @import data.table magrittr
-#' @importFrom stats na.omit
-#' @return
-#' The `xic_peaks` data.table with a new columns:
-#'   - `peak_score`: Overall scoring of the peaks
-#'   - `peak_in_range`: Number of peaks in range
-#'   - `peaks_mslevels`: MS(n) level of the peak
-#'   - `diff_from_ref`: Time difference from reference
-#' @export
-#'
-get_peak_scores_mult <- function(xic_peaks, cpd_events, CpdIndex = NULL, cpd_info = NULL) {
-  if (!is.null(CpdIndex)) {
-    if (CpdIndex %in% xic_peaks[, unique(CpdIndex)]) {
-      CpdIndex_sel <- CpdIndex
-    } else {
-      stop("CpdIndex not found in xic_peaks$CpdIndex")
-    }
-  } else {
-    if (!"CpdIndex" %in% names(xic_peaks)) {
-      xic_peaks[, CpdIndex := 1]
-    }
-    CpdIndex_sel <- xic_peaks[, unique(CpdIndex)]
-  }
-  output <- lapply(CpdIndex_sel, function(x) {
-    cpd_dt_i <- xic_peaks[CpdIndex == x]
-    peak_scores_i <- get_peak_scores(cpd_dt_i, cpd_info[CpdIndex == x, rtmin])
-    return(peak_scores_i[])
-  }) %>%
-    rbindlist()
-  return(output)
-}
 
 #' Use MassSpecWavelet to detect peaks
 #'
-#' @param xic The XIC as a data.table with the columns:
-#'            'scan' and 'i'.
-#' @param direction Character to choose the right 'R' or left 'L'
-#'                  side of the peak
-#' @param peak_sel_center Scan corresponding to the peak apex.
+#' @param xic The XIC as a data.table with the following columns:
+#'              \itemize{
+#'                \item `scan`: scan index as unique `integer`
+#'                \item `i`: intensities as `numeric`
+#'              }
+#' @param direction Character to choose which side of the peak to return: 
+#'                    the right 'R' or left 'L' side
+#' @param peak_sel_center Scan corresponding to the peak apex (starting point).
 #' @import data.table
 #' @return
 #' A numeric value corresponding to the scan on the right `R` or
@@ -100,7 +65,11 @@ get_peak_scores_mult <- function(xic_peaks, cpd_events, CpdIndex = NULL, cpd_inf
 #'
 #' @export
 #'
-get_peak_range <- function(xic, direction = c("R", "L"), peak_sel_center) {
+get_peak_range <- function(
+  xic,
+  direction = c("R", "L"),
+  peak_sel_center
+) {
   temp_xic <- copy(xic)
   if (direction == "R") {
     temp_xic[, i_n := i - shift(i, 1)]
@@ -141,28 +110,28 @@ get_peak_range <- function(xic, direction = c("R", "L"), peak_sel_center) {
 
 #' Use MassSpecWavelet to detect peaks
 #'
-#' @param vecint Numeric vector containing the intensities
-#'               sorted by the time dimension.
-#' @param snrth Signal over Noise threshold (see
-#'               `MassSpecWavelet::peakDetectionCWT()`)
+#' @param vecint      Intensities
+#'                    sorted by the time dimension as a `numeric vector`
 #' @param majpeakonly Logical to extract only the majors peaks (`TRUE`)
-#'                    or all peaks (`FALSE`) from MassSpecWavelet
-#' @param limits Should peak boundaries be found on true data (`xic`) or
-#'               on CentWave scales (`scales`: default)?
-#' @param ... Other options passed to `MassSpecWavelet::peakDetectionCWT()`
+#'                    or all peaks (`FALSE`) with
+#'                    \code{\link[MassSpecWavelet]{peakDetectionCWT}}
+#' @param limits      Should peak boundaries be found on true data (`xic`) or
+#'                    on CentWave scales (`scales` = default)?
+#'
+#' @param ... Other options passed to \code{\link[MassSpecWavelet]{peakDetectionCWT}}
+#' @inheritParams MassSpecWavelet::peakDetectionCWT
 #' @importFrom MassSpecWavelet peakDetectionCWT prepareWavelets
 #' @return
 #' A data.table with information on chromatographic peaks
 #' with the following columns:
-#'   - `peakID`: Peak name given by `MassSpecWavelet::peakDetectionCWT()`
-#'   - `scmin`, `scmax`, `scpos`: left, right boundaries and apex of the peak
-#'                                (index of the values in vecint)
-#'   - `scale`: scale of the peak given by `MassSpecWavelet::peakDetectionCWT()`
+#'   - `peakID`: Peak name given by \code{\link[MassSpecWavelet]{peakDetectionCWT}}  
+#'   - `scmin`, `scmax`, `scpos`: left, right and apex of the peak boundaries from `vecint`  
+#'   - `scale`: scale of the peak given by \code{\link[MassSpecWavelet]{peakDetectionCWT}}  
 #' @export
 #'
 detect_centwave_peaks <- function(
   vecint,
-  snrth = 3,
+  SNR.Th = 3,
   majpeakonly = TRUE,
   limits = c("xic", "scales")[2],
   ...
@@ -175,7 +144,7 @@ detect_centwave_peaks <- function(
       mslength = length(vecint),
       wavelet_xlimit = 3
     ),
-    SNR.Th = snrth,
+    SNR.Th = SNR.Th,
     tuneIn = FALSE,
     ...
   )
@@ -289,17 +258,22 @@ calculate_zigzag <- function(vecint) {
 
 #' Find peaks usint CentWave
 #'
-#' @param xic_mat a matrix or data.table with the following columns:
-#'                  - `rt` with the retention time
-#'                  - `i` with the intensities
-#' @param minscan numeric value for the minimum number of scan
-#'                inside a peak to keep it
+#' @param xic_mat A `matrix` or `data.table` with the following columns:
+#'              \itemize{
+#'                \item `rt` with the retention time as `numeric`
+#'                \item `i` with the intensities as `numeric`
+#'              }
+#' @param minscan Threshold for the minimum number of scan inside a peak to keep it as `integer`.
 #' @inheritParams detect_centwave_peaks
 #'
 #' @export
 #' @import data.table
 #'
-get_peaks_xic <- function(xic_mat, minscan = 3, majpeakonly = FALSE) {
+get_peaks_xic <- function(
+  xic_mat,
+  minscan = 3,
+  majpeakonly = FALSE
+) {
   if (data.table::is.data.table(xic_mat)) {
     if (any(!c("rt", "i") %in% names(xic_mat))) {
       stop("if xic_mat is a data.table, we need 'rt' and 'i' columns")
@@ -387,97 +361,4 @@ get_peaks_from_xic <- function(xic_cpd, minscan = 4) {
   }, by = .(CpdIndex, filter)]
 
   return(output)
-}
-
-
-#' Return best peak
-#'
-#' @param pk_scores A data.table containing peaks info and scores
-#'
-#' @return
-#' A data.table containing the only best peaks for each `CpdIndex`
-#' based on the maximum of `peak_score` column
-#'
-#' @export
-#'
-fun_best_peaks <- function(pk_scores) {
-  if (!data.table::is.data.table(pk_scores)) {
-    return(NULL)
-  }
-  pk_scores[, .SD[which.max(peak_score)], by = .(CpdIndex)]
-}
-
-
-#' Add peaks detection to annobject
-#'
-#' @param rt_limit limit rt deviation from reference when searching peaks
-#' @inheritParams add_events
-#' @inheritParams add_xics
-#' @inheritParams get_peaks_xic
-#'
-#' @return
-#' The annobject with the Peaks slots for each compound
-#' filled.
-#'
-#' @export
-#'
-add_best_peaks <- function(
-  annobject,
-  minscan = 3,
-  rt_limit = NULL,
-  debug = FALSE
-) {
-  ## Select cpd with XICs
-  cpd_to_get <- sapply(annobject$cpd, function(x) {
-    nrow(x$XICs) > 0
-  }) %>%
-    which()
-  for (i in cpd_to_get) {
-    if (isTRUE(debug)) {
-      message("cpd: ", i, " file: ", appendLF = FALSE)
-    }
-    best_peak_dt <- split(
-      annobject$cpd[[i]]$XICs,
-      annobject$cpd[[i]]$XICs$FileIndex
-    ) %>%
-      lapply(., function(x) {
-        if (isTRUE(debug)) {
-          message(x$FileIndex %>% unique(), "-", appendLF = FALSE)
-        }
-        ## Add CpdIndex in x
-        CpdIndex_i <- i
-        x[, CpdIndex := CpdIndex_i]
-        xic_peaks <- get_peaks_from_xic(xic_cpd = x, minscan = minscan)
-        if (!is.null(rt_limit) && nrow(xic_peaks) > 0) {
-          rt_lim_range <- annobject$cpd[[i]]$cpd_info$rtmin +
-            c(-rt_limit, +rt_limit)
-          xic_peaks <- xic_peaks[rt %between% rt_lim_range]
-        }
-
-        pk_scores_dt <- get_peak_scores_mult(
-          xic_peaks = xic_peaks,
-          cpd_events = annobject$file$MSEvents[[unique(x$FileIndex)]][
-            EventIndex %in%
-              annobject$cpd[[i]]$MSEvents[
-                FileIndex == unique(x$FileIndex), EventIndex
-              ]
-          ],
-          CpdIndex = NULL,
-          cpd_info = annobject$cpd[[i]]$cpd_info
-        )
-        if (nrow(pk_scores_dt) == 0) {
-          return(NULL)
-        } else {
-          pk_best_dt <- fun_best_peaks(pk_scores_dt)
-          pk_best_dt[, FileIndex := unique(x$FileIndex)]
-          return(pk_best_dt[])
-        }
-      }) %>%
-      rbindlist()
-    if (isTRUE(debug)) {
-      message("", appendLF = TRUE)
-    }
-    annobject$cpd[[i]]$Peaks <- best_peak_dt
-  }
-  return(annobject)
 }

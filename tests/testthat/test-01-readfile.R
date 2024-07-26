@@ -88,11 +88,24 @@ test_that("Spec2Xtract::check_rawfile: .mzXML", {
   )
 })
 
-
-
-test_that("Spec2Xtract::check_rawfile: Error file doesn't exist", {
+test_that("check_rawfile: Error file doesn't exist", {
   f <- "/sqdf/SQdfsq/DFsq/FDsqdF/sdqf.raw"
   testthat::expect_error(
     Spec2Xtract::check_rawfile(f)
   )
 })
+
+test_that(
+  "check_rawfile: wrong .raw format", {
+    f <- system.file(
+      "threonine/threonine_i2_e35_pH_tree.mzXML",
+      package = "msdata"
+    )
+    temp_path <- tempfile("file", fileext = ".raw")
+    file.copy(f, temp_path)
+
+    testthat::expect_error(
+      Spec2Xtract::check_rawfile(temp_path)
+    )
+  }
+)

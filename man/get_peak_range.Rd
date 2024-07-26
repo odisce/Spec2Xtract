@@ -7,13 +7,16 @@
 get_peak_range(xic, direction = c("R", "L"), peak_sel_center)
 }
 \arguments{
-\item{xic}{The XIC as a data.table with the columns:
-'scan' and 'i'.}
+\item{xic}{The XIC as a data.table with the following columns:
+\itemize{
+\item \code{scan}: scan index as unique \code{integer}
+\item \code{i}: intensities as \code{numeric}
+}}
 
-\item{direction}{Character to choose the right 'R' or left 'L'
-side of the peak}
+\item{direction}{Character to choose which side of the peak to return:
+the right 'R' or left 'L' side}
 
-\item{peak_sel_center}{Scan corresponding to the peak apex.}
+\item{peak_sel_center}{Scan corresponding to the peak apex (starting point).}
 }
 \value{
 A numeric value corresponding to the scan on the right \code{R} or

@@ -2,19 +2,27 @@
 % Please edit documentation in R/init_object.R
 \name{load_files}
 \alias{load_files}
-\title{Create data.table from files path}
+\title{Create \code{data.table} from files path}
 \usage{
 load_files(files)
 }
 \arguments{
-\item{files}{Vector of path(s) to \code{.raw} files}
+\item{files}{A \verb{character vector} of path(s) to \code{.raw} files}
 }
 \value{
-Details on returned object.
+Return a \code{data.table} with the following columns:
+\itemize{
+\item \code{file_path}: the full file path
+\item \code{file_name}: the file base name
+\item \code{FileIndex}: a unique \code{integer} to identify the file
+\item \code{FileExist}: a \code{logical} to test if the file exist or not
+}
 }
 \description{
-Description
+Takes \code{.raw} file paths and return a formatted
+\code{data.table}.
 }
 \examples{
 load_files(files = rawrr::sampleFilePath())
+
 }

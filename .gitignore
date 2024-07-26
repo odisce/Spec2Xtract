@@ -6,3 +6,4 @@ _targets*
 report*
 *Rout
 test-dev*
+dev*.R

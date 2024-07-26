@@ -7,11 +7,17 @@
 fun_check_cpd(cpd)
 }
 \arguments{
-\item{cpd}{A table containing compound information, must have the following
-columns: compound, rtsec, elemcomposition and optionally inchikey}
+\item{cpd}{A table containing compound information, must have the
+following columns: \code{compound}, \code{rtsec}, \code{elemcomposition} and
+optionally \code{inchikey}}
 }
 \value{
-Return a formated data.table with compound informations
+Return a formated \code{data.table} with input informations +
+the following columns:
+\itemize{
+\item \code{CpdIndex}: unique \code{integer} to identify the compound entry.
+\item \code{rtmin}: retention time in minutes.
+}
 }
 \description{
 Check compound file
