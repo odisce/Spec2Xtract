@@ -4,13 +4,13 @@
 \alias{get_events_types}
 \title{Get events info by parsing the scanType}
 \usage{
-get_events_types(index_table, raw_path, firstevent = TRUE)
+get_events_types(index_table, rawpath, firstevent = TRUE)
 }
 \arguments{
 \item{index_table}{The index table as returned by
-\code{Spec2Xtract::get_rawindex()}}
+\code{\link[=get_rawindex]{get_rawindex()}}}
 
-\item{raw_path}{Path to the raw file}
+\item{rawpath}{Path to the \code{.raw} file}
 
 \item{firstevent}{Should all MSn events be checked individually
 (\code{FALSE}) or only the first one (\code{TRUE}).}
@@ -18,7 +18,7 @@ get_events_types(index_table, raw_path, firstevent = TRUE)
 \value{
 Return a \code{data.table} listing the different MS(n) events in
 a \strong{.raw} file. if \code{firstevent} is set to \code{TRUE}, the function
-will check only the first event of each MSLevel. If set to
+will check only the first event of each MSn events. If set to
 \code{FALSE}, the function will check all events (it may take a lot
 of time depending on the file).
 }

@@ -7,16 +7,10 @@
 fun_get_xic(rawpath, mz, ppm, filter, type = c("xic", "tic", "bpc")[1])
 }
 \arguments{
-\item{rawpath}{Path to the .raw file}
-
-\item{mz}{centered mass of the XIC window}
-
-\item{ppm}{mass range of the XIC window (in ppm)}
+\item{rawpath}{Path to the \code{.raw} file}
 
 \item{filter}{special string to filter events
 (ex.: \code{"ms"}, or \code{"ms2"})}
-
-\item{type}{string to extract either the \code{"xic"} or \code{"tic"}}
 }
 \value{
 A \code{data.table} containing the XIC with the following columns:

@@ -20,29 +20,9 @@ target_Spec2Xtract(
 )
 }
 \arguments{
-\item{files}{Vector containing the paths to the .raw or .mzML files}
-
-\item{cpd}{A table containing compound information, must have the following
-columns: compound, rtsec, elemcomposition and optionally inchikey}
-
-\item{save_dir}{Directory to save tables}
-
-\item{firstevent}{Should all MSn events be checked individually
-(\code{FALSE}) or only the first one (\code{TRUE}).}
-
-\item{prec_ppm}{Mass tolerance to find the precursor (in ppm)}
-
-\item{minscan}{numeric value for the minimum number of scan
-inside a peak to keep it}
-
-\item{rt_limit}{limit rt deviation from reference when searching peaks}
-
 \item{filter_irel}{Filter ions based on relative intensity}
 
 \item{filter_isopurity}{Filter ions based on the isolation purity (from 0 to 100)}
-
-\item{ppm}{mass deviation for elemental composition
-search in ppm}
 
 \item{one_msp_file}{Boolean to combine all spectra to one unique .msp file \code{TRUE} or to
 separate files \code{FALSE}}

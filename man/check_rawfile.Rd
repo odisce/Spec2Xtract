@@ -2,20 +2,20 @@
 % Please edit documentation in R/readfile.R
 \name{check_rawfile}
 \alias{check_rawfile}
-\title{Check if raw file exist}
+\title{Check if file exist}
 \usage{
 check_rawfile(rawpath)
 }
 \arguments{
-\item{rawpath}{Path to the .raw file}
+\item{rawpath}{Path to the \code{.raw} file}
 }
 \value{
-This function check .raw and .mzML files for readability.
+This function check \code{.raw} and \code{.mzML} files for readability.
 If the file is readable it will return the full path, if
 not it will stop with an error.
 }
 \description{
-Check if raw file exist
+Check if file exist
 }
 \examples{
 check_rawfile(rawrr::sampleFilePath())

@@ -164,3 +164,7 @@ targets::tar_make()
 ```
 
 The results will be stored in the `./report` folder.
+
+
+## to remove
+xtract_spectra|init_object|add_events|add_cpd_events|add_xics|add_best_peaks|add_events_to_extract|add_spectra|add_mspurity|add_annot|export_tables|cpd_add_events

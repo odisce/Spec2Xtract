@@ -6,35 +6,34 @@
 \usage{
 detect_centwave_peaks(
   vecint,
-  snrth = 3,
+  SNR.Th = 3,
   majpeakonly = TRUE,
   limits = c("xic", "scales")[2],
   ...
 )
 }
 \arguments{
-\item{vecint}{Numeric vector containing the intensities
-sorted by the time dimension.}
+\item{vecint}{Intensities
+sorted by the time dimension as a \verb{numeric vector}}
 
-\item{snrth}{Signal over Noise threshold (see
-\code{MassSpecWavelet::peakDetectionCWT()})}
+\item{SNR.Th}{SNR (Signal to Noise Ratio) threshold}
 
 \item{majpeakonly}{Logical to extract only the majors peaks (\code{TRUE})
-or all peaks (\code{FALSE}) from MassSpecWavelet}
+or all peaks (\code{FALSE}) with
+\code{\link[MassSpecWavelet]{peakDetectionCWT}}}
 
 \item{limits}{Should peak boundaries be found on true data (\code{xic}) or
-on CentWave scales (\code{scales}: default)?}
+on CentWave scales (\code{scales} = default)?}
 
-\item{...}{Other options passed to \code{MassSpecWavelet::peakDetectionCWT()}}
+\item{...}{Other options passed to \code{\link[MassSpecWavelet]{peakDetectionCWT}}}
 }
 \value{
 A data.table with information on chromatographic peaks
 with the following columns:
 \itemize{
-\item \code{peakID}: Peak name given by \code{MassSpecWavelet::peakDetectionCWT()}
-\item \code{scmin}, \code{scmax}, \code{scpos}: left, right boundaries and apex of the peak
-(index of the values in vecint)
-\item \code{scale}: scale of the peak given by \code{MassSpecWavelet::peakDetectionCWT()}
+\item \code{peakID}: Peak name given by \code{\link[MassSpecWavelet]{peakDetectionCWT}}
+\item \code{scmin}, \code{scmax}, \code{scpos}: left, right and apex of the peak boundaries from \code{vecint}
+\item \code{scale}: scale of the peak given by \code{\link[MassSpecWavelet]{peakDetectionCWT}}
 }
 }
 \description{

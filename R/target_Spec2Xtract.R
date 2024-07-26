@@ -4,19 +4,11 @@
 #' @param filter_isopurity Filter ions based on the isolation purity (from 0 to 100)
 #' @param one_msp_file Boolean to combine all spectra to one unique .msp file `TRUE` or to
 #' separate files `FALSE`
-#' @inheritParams init_object
-#' @inheritParams add_events
-#' @inheritParams add_cpd_events
-#' @inheritParams add_xics
-#' @inheritParams add_best_peaks
-#' @inheritParams add_events_to_extract
-#' @inheritParams add_spectra
-#' @inheritParams add_mspurity
-#' @inheritParams add_annot
-#' @inheritParams export_tables
+#' @inheritParams run_Spec2Xtract
 #' @inheritParams targets::tar_target_raw
 #' @return A list of targets objects.
 #' @import targets tarchetypes data.table magrittr ggplot2 ggpubr ggrepel
+#' @importFrom igraph graph_from_data_frame components
 #' @export
 #' @examples
 #' \dontrun{
@@ -126,7 +118,7 @@ target_Spec2Xtract <- function(
       substitute({
         temp_dt <- get_events_types(
           F_INDEX,
-          raw_path = F_INFO_dt$file_path,
+          rawpath = F_INFO_dt$file_path,
           firstevent = firstevent
         )
 
@@ -1166,9 +1158,9 @@ target_Spec2Xtract <- function(
 #' files and one to the compound table.
 #' @param files_dir path to the directory containing the
 #'                  .raw files
-#' @param cpd_path path to the table with compound informations
 #' @param ncore Number of parallel workers
 #' @inheritParams target_Spec2Xtract
+#' @inheritParams open_cpd_file
 #' @import targets data.table magrittr
 #' @importFrom crew crew_controller_local
 #' @importFrom tools file_ext
@@ -1201,16 +1193,8 @@ run_Spec2Xtract <- function(
       {
         targets::tar_script(
           {
-            table_ext <- tools::file_ext(cpd_path)
-            if (table_ext == "xlsx") {
-              cpd_in <- openxlsx::read.xlsx(cpd_path)
-              cpd_dt <- data.table::as.data.table(cpd_in)
-            } else if (table_ext %in% c("csv", "tsv", "txt")) {
-              cpd_dt <- data.table::fread(cpd_path)
-            }
-
             library("Spec2Xtract")
-
+            cpd_dt <- open_cpd_file(cpd_path)
             targets::tar_option_set(
               packages = c("data.table", "magrittr", "Spec2Xtract"),
               error = "continue"

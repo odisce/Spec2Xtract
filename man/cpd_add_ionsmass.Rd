@@ -2,19 +2,22 @@
 % Please edit documentation in R/init_object.R
 \name{cpd_add_ionsmass}
 \alias{cpd_add_ionsmass}
-\title{Calculate ion mass from elemental composition}
+\title{Calculate ion mass from the elemental composition}
 \usage{
 cpd_add_ionsmass(cpd)
 }
 \arguments{
-\item{cpd}{A table containing compound information, must have the following
-columns: compound, rtsec, elemcomposition and optionally inchikey}
+\item{cpd}{A \code{data.table} produced by from \code{\link[=fun_check_cpd]{fun_check_cpd()}}}
 }
 \value{
-Return the \code{cpd} table with:
-mz_neutral, mz_pos and mz_neg values
-calculated from the elemental composition
+Return a \code{data.table} with the following columns:
+\itemize{
+\item \code{mz_neutral}: neutral mass
+\item \code{mz_pos}: positive mass
+\item \code{mz_neg}: negative mass
+}
 }
 \description{
-Calculate ion mass from elemental composition
+Use \link{Spec2Annot} functions to calculate the ions masses
+from the neutral elemental composition.
 }

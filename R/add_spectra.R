@@ -224,38 +224,3 @@ get_spectrum_db <- function(ms_scan_to_get, rawpath) {
     )
   )
 }
-
-#' Add spectrum to annobject
-#'
-#' @inheritParams add_events
-#'
-#' @import data.table
-#'
-#' @return
-#' Fill the `spectra` slots of annobject.
-#'
-#' @export
-#'
-add_spectra <- function(annobject) {
-  cpd_to_get <- sapply(annobject$cpd, function(x) {
-    if (is.null(x$MSspectra$scan_info)) {
-      return(FALSE)
-    } else {
-      nrow(x$MSspectra$scan_info) > 0
-    }
-  }) %>%
-    which()
-  for (i in cpd_to_get) {
-    scan_dt <- annobject$cpd[[i]]$MSspectra$scan_info
-
-    spectrum_db <- lapply(seq_len(nrow(scan_dt)), function(rowi) {
-      scan_dt_i <- scan_dt[rowi, ]
-      get_spectrum_db(
-        ms_scan_to_get = scan_dt_i,
-        rawpath = annobject$file$info$file_path[[scan_dt_i$FileIndex]]
-      )
-    })
-    annobject$cpd[[i]]$MSspectra$spectra <- spectrum_db
-  }
-  return(annobject)
-}

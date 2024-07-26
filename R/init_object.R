@@ -1,8 +1,39 @@
+#' Open a table in different format
+#'
+#' Open a table in one of `.xlsx`, `.csv`, `.tsv`, `.txt`
+#' formats and convert to a data.table
+#' 
+#' @param cpd_path path to the table with compound informations
+#' @importFrom data.table as.data.table fread
+#' @importFrom openxlsx read.xlsx
+#' @importFrom tools file_ext
+#' @return
+#' The compound table in `data.table` format.
+#' @export
+open_cpd_file <- function(cpd_path) {
+  cpd_dt <- NULL
+  if (file.exists(cpd_path)) {
+    table_ext <- tools::file_ext(cpd_path)
+    if (table_ext == "xlsx") {
+      cpd_in <- openxlsx::read.xlsx(cpd_path)
+      cpd_dt <- data.table::as.data.table(cpd_in)
+    } else if (table_ext %in% c("csv", "tsv", "txt")) {
+      cpd_dt <- data.table::fread(cpd_path)
+    } else {
+      stop("cpd extension: '", table_ext, "' not recognized, must be: .csv, .tsv, .txt or .xlsx")
+    }
+  } else {
+    stop("cpd file not found on disk at: ", cpd_path)
+  }
+  return(cpd_dt)
+}
+
 #' Download sample raw file in temporary directory
 #'
-#' Download a sample .RAW file from metabolights.
+#' Download a sample `.raw` file from metabolights.
 #' Used for testing purposed and some examples.
 #'
+#' @param url URL adress to a `.raw` file to download.
 #' @return
 #' If the file can be downloaded, return the path to the file
 #' on the current disk. If the file is unavailable, then
@@ -11,21 +42,14 @@
 #' get_sample_rawfile()
 #' @importFrom utils download.file
 #' @export
-get_sample_rawfile <- function() {
-  if (
-    file.exists(
-      system.file("data/samplefile.raw", package = "Spec2Xtract")
-    )
-  ) {
-    return(
-      system.file(
-        "data/samplefile.raw",
-        package = "Spec2Xtract"
-      )
-    )
+get_sample_rawfile <- function(url = NULL) {
+  if (is.null(url)) {
+    url_sample <- "https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS20/FILES/391_3-Hydroxy-4-methoxycinnamic_acid_NEG.RAW"
   } else {
-    tryCatch({
-      url_sample <- "https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS20/391_3-Hydroxy-4-methoxycinnamic_acid_NEG.RAW"
+    url_sample <- url
+  }
+  out <- tryCatch(
+    {
       temp_dir <- tempdir()
       temp_file <- file.path(temp_dir, "test.raw")
       download.file(url = url_sample, destfile = temp_file)
@@ -38,8 +62,13 @@ get_sample_rawfile <- function() {
     error = function(e) {
       print(e)
       return(FALSE)
-    })
-  }
+    },
+    warning = function(w) {
+      print(w)
+      return(FALSE)
+    }
+  )
+  return(out)
 }
 
 #' Get .raw index as data.table
@@ -63,24 +92,27 @@ get_rawindex <- function(rawpath) {
     return()
 }
 
-#' Extract ms level and collision type, energy from index
+#' Parse the scan index table
+#'
+#' Parse the scan index table to retrieve informations
+#' on fragmentation levels, collsision energy, polarity,
+#' etc.
 #'
 #' @inheritParams get_events_types
 #'
 #' @import data.table magrittr
 #'
 #' @return
-#' Add the following columns to \code{index_table}:
-#'   - `"msLevel"`: Fragmentation level
-#'   - `"spec_energy"`: Collision energy
-#'   - `"spec_coltype"`: Collision type
-#'   - `"spec_polarity"`: Polarity
-#'   - `"spec_prec"`: Precursor m/Z
+#' Add the following columns to `index_table`:
+#'   - `msLevel`: Fragmentation level
+#'   - `spec_energy`: Collision energy
+#'   - `spec_coltype`: Collision type
+#'   - `spec_polarity`: Polarity
+#'   - `spec_prec`: Precursor m/Z
 #'
 #' @export
 #'
 parse_index_dt <- function(index_table) {
-
   pattern_search <- list(
     "spec_prec" = list(
       "pattern" = "^.*ms[0-9]{1,2} ([0-9]{1,5}\\.[0-9]{1,6})\\@.*$",
@@ -143,11 +175,17 @@ parse_index_dt <- function(index_table) {
 
 #' Check compound file
 #'
-#' @param cpd A table containing compound information, must have the following
-#'            columns: compound, rtsec, elemcomposition and optionally inchikey
+#' @param cpd A table containing compound information, must have the
+#' following columns: `compound`, `rtsec`, `elemcomposition` and
+#' optionally `inchikey`
 #'
 #' @import data.table magrittr
-#' @return Return a formated data.table with compound informations
+#' @return
+#' Return a formated `data.table` with input informations +
+#' the following columns:
+#'   - `CpdIndex`: unique `integer` to identify the compound entry.
+#'   - `rtmin`: retention time in minutes.
+#'
 #' @examples
 #' fun_check_cpd(Spec2Xtract:::example_cpdlist_realdt)
 #'
@@ -187,18 +225,21 @@ fun_check_cpd <- function(cpd) {
   return(x[])
 }
 
-#' Calculate ion mass from elemental composition
+#' Calculate ion mass from the elemental composition
 #'
-#' @inheritParams fun_check_cpd
+#' Use [Spec2Annot] functions to calculate the ions masses
+#' from the neutral elemental composition.
+#'
+#' @param cpd A `data.table` produced by from [fun_check_cpd()]
 #'
 #' @import magrittr data.table Spec2Annot
 #' @importFrom Spec2Annot mz_from_string mz_calc_ion
 #'
-#' @return Return the \code{cpd} table with:
-#'         mz_neutral, mz_pos and mz_neg values
-#'         calculated from the elemental composition
+#' @return Return a `data.table` with the following columns:
+#'   - `mz_neutral`: neutral mass
+#'   - `mz_pos`: positive mass
+#'   - `mz_neg`: negative mass
 #' @export
-#'
 cpd_add_ionsmass <- function(cpd) {
   temp <- cpd[, {
     mz_neutral <- Spec2Annot::mz_from_string(string = elemcomposition)
@@ -214,15 +255,22 @@ cpd_add_ionsmass <- function(cpd) {
     return()
 }
 
-#' Create data.table from files path
+#' Create `data.table` from files path
 #'
-#' Description
+#' Takes `.raw` file paths and return a formatted
+#' `data.table`.
 #'
-#' @param files Vector of path(s) to `.raw` files
+#' @param files A `character vector` of path(s) to `.raw` files
 #' @import data.table magrittr
-#' @return Details on returned object.
+#' @return Return a `data.table` with the following columns:
+#'   - `file_path`: the full file path
+#'   - `file_name`: the file base name
+#'   - `FileIndex`: a unique `integer` to identify the file
+#'   - `FileExist`: a `logical` to test if the file exist or not
+#'
 #' @examples
 #' load_files(files = rawrr::sampleFilePath())
+#'
 #' @export
 #'
 load_files <- function(files) {
@@ -241,84 +289,4 @@ load_files <- function(files) {
   }, by = FileIndex]
 
   return(temp[])
-}
-
-#' Initialize object to store results
-#'
-#' @param files Vector containing the paths to the .raw or .mzML files
-#' @inheritParams fun_check_cpd
-#'
-#' @import data.table magrittr
-#'
-#' @return
-#' Return a list with the following levels:
-#'   - `"cpd_info"`: data.table with information on the compounds from cpd.
-#'   - `"XICs"`: level to store XICs informations
-#'   - `"Peaks"`: level to store peaks informations
-#'   - `"MSspectra"`: level to store mass spectrum
-#'
-#' @export
-#'
-init_object <- function(files, cpd) {
-  ## Add files info
-  temp_obj <- list(
-    "file" = list(
-      "info" = data.table(
-        file_path = files,
-        file_name = files %>%
-          basename(.) %>%
-          tools::file_path_sans_ext(.)
-      )
-    )
-  )
-  ## Add files index
-  temp_obj$file$index <- lapply(files, function(x) {
-    raw_index <- tryCatch(
-      {
-        x %>%
-          get_rawindex() %>%
-          parse_index_dt()
-      }, error = function(e) {
-        print(e)
-        return(FALSE)
-      }
-    )
-    return(raw_index)
-  })
-
-  ## If any file is F, add info
-  for (y in seq_len(nrow(temp_obj$file$info))) {
-    if (!is.data.table(temp_obj$file$index[[y]]) &&
-          temp_obj$file$index[[y]] == FALSE) {
-      temp_obj$file$info[y, FileCheck := FALSE]
-    } else {
-      temp_obj$file$info[y, FileCheck := TRUE]
-    }
-  }
-
-  ## Add compound list
-  cpd <- fun_check_cpd(cpd)
-  temp_obj$cpd <- lapply(seq_len(nrow(cpd)), function(x) {
-    temp <- cpd[x, ]
-    cpd_dt_i <- tryCatch({
-      temp %>%
-        cpd_add_ionsmass(.) %>%
-        {
-          .[, cpdCheck := TRUE][]
-        }
-    }, error = function(e) {
-      print(e)
-      temp[, cpdCheck := FALSE]
-      temp[]
-    })
-
-    list(
-      "cpd_info" = cpd_dt_i,
-      "XICs" = NULL,
-      "Peaks" = NULL,
-      "MSspectra" = NULL
-    )
-  })
-
-  return(temp_obj)
 }

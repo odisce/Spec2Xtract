@@ -25,27 +25,12 @@ run_Spec2Xtract(
 
 \item{cpd_path}{path to the table with compound informations}
 
-\item{firstevent}{Should all MSn events be checked individually
-(\code{FALSE}) or only the first one (\code{TRUE}).}
-
-\item{prec_ppm}{Mass tolerance to find the precursor (in ppm)}
-
-\item{minscan}{numeric value for the minimum number of scan
-inside a peak to keep it}
-
-\item{rt_limit}{limit rt deviation from reference when searching peaks}
-
-\item{ppm}{mass deviation for elemental composition
-search in ppm}
-
 \item{filter_irel}{Filter ions based on relative intensity}
 
 \item{filter_isopurity}{Filter ions based on the isolation purity (from 0 to 100)}
 
 \item{one_msp_file}{Boolean to combine all spectra to one unique .msp file \code{TRUE} or to
 separate files \code{FALSE}}
-
-\item{save_dir}{Directory to save tables}
 
 \item{ncore}{Number of parallel workers}
 }

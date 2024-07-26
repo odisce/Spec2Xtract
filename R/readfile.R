@@ -1,8 +1,8 @@
-#' Check if raw file exist
+#' Check if file exist
 #'
-#' @param rawpath Path to the .raw file
+#' @param rawpath Path to the `.raw` file
 #'
-#' @return This function check .raw and .mzML files for readability.
+#' @return This function check `.raw` and `.mzML` files for readability.
 #'         If the file is readable it will return the full path, if
 #'         not it will stop with an error.
 #'

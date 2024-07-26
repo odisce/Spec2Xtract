@@ -4,7 +4,10 @@
 \alias{get_sample_rawfile}
 \title{Download sample raw file in temporary directory}
 \usage{
-get_sample_rawfile()
+get_sample_rawfile(url = NULL)
+}
+\arguments{
+\item{url}{URL adress to a \code{.raw} file to download.}
 }
 \value{
 If the file can be downloaded, return the path to the file
@@ -12,7 +15,7 @@ on the current disk. If the file is unavailable, then
 return \code{FALSE}
 }
 \description{
-Download a sample .RAW file from metabolights.
+Download a sample \code{.raw} file from metabolights.
 Used for testing purposed and some examples.
 }
 \examples{
