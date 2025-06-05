@@ -1,6 +1,6 @@
 #' targets factory to extract MS2 spectra
 #'
-#' @param filter_irel Filter ions based on relative intensity
+#' @param filter_irel Filter ions based on relative intensity (from 0 to 1)
 #' @param filter_isopurity Filter ions based on the isolation purity (from 0 to 100)
 #' @param one_msp_file Boolean to combine all spectra to one unique .msp file `TRUE` or to
 #' separate files `FALSE`
@@ -362,7 +362,7 @@ target_Spec2Xtract <- function(
             rtmin
           ]
           if (!is.null(rt_limit)) {
-            rt_lim_range <- cpd_rtmin + (rt_limit * c(-1, 1))
+            rt_lim_range <- cpd_rtmin + (rt_limit*60 * c(-1, 1))
             CPD_peaks[rt %between% rt_lim_range, PeaksInRange := TRUE]
           }
           ## Get scores
@@ -624,6 +624,7 @@ target_Spec2Xtract <- function(
     tar_target_raw(
       "ANNOT", substitute({
         ## Add annotation to a different layer if multiple cpd for the same spectrum
+        ## Combine annotation at the end
         if (isFALSE(ANNOT_ITER)) {
           return(NULL)
         }
@@ -972,28 +973,32 @@ target_Spec2Xtract <- function(
                   return(NULL)
                 }
                 spec_ind <- which(names(SPECTRA_DB$spectra_db) == as.character(spectra_info_i$SpectrumIndex))
-                spec_out <- SPECTRA_DB$spectra_db[[spec_ind]]
-                ## Save xlsx
-                save_path <- file.path(save_l$Spectra_dir_xlsx, paste0(spectra_info_i$SpecID, ".xlsx"))
-                temp <- openxlsx::write.xlsx(
-                  x = spec_out[order(mz)],
-                  file = save_path,
-                  overwrite = TRUE
-                )
-                ## Save msp
-                save_path <- file.path(save_l$Spectra_dir_msp, paste0(spectra_info_i$SpecID, ".msp"))
-                if (isTRUE(one_msp_file)) {
-                  file_out <- NULL
+                if (length(spec_ind) > 0) {
+                  spec_out <- SPECTRA_DB$spectra_db[[spec_ind]][order(mz), -c("iter")] %>% unique()
+                  ## Save xlsx
+                  save_path <- file.path(save_l$Spectra_dir_xlsx, paste0(spectra_info_i$SpecID, ".xlsx"))
+                  temp <- openxlsx::write.xlsx(
+                    x = spec_out,
+                    file = save_path,
+                    overwrite = TRUE
+                  )
+                  ## Save msp
+                  save_path <- file.path(save_l$Spectra_dir_msp, paste0(spectra_info_i$SpecID, ".msp"))
+                  if (isTRUE(one_msp_file)) {
+                    file_out <- NULL
+                  } else {
+                    file_out <- save_path
+                  }
+                  temp <- save_as_msp(
+                    spectra_dt = spec_out,
+                    spectra_info = spectra_info_i,
+                    cpd_info = CPD_INFO_dt[CpdIndex == spectra_info_i$CpdIndex, ],
+                    file_out = file_out
+                  )
+                  return(temp)
                 } else {
-                  file_out <- save_path
+                  return(NULL)
                 }
-                temp <- save_as_msp(
-                  spectra_dt = spec_out,
-                  spectra_info = spectra_info_i,
-                  cpd_info = CPD_INFO_dt[CpdIndex == spectra_info_i$CpdIndex, ],
-                  file_out = file_out
-                )
-                return(temp)
               }
             )
             ## Write one msp
@@ -1065,6 +1070,9 @@ target_Spec2Xtract <- function(
         }
         spectra_info_i <- SPECTRA_DB$spectra_info_dt[SPECTRA_gg_ITER, ]
         spec_ind <- which(names(SPECTRA_DB$spectra_db) == as.character(spectra_info_i$SpectrumIndex))
+        if (length(spec_ind) == 0) {
+          return(NULL)
+        }
         spectra_i <- SPECTRA_DB$spectra_db[[spec_ind]]
         cpd_info_i <- CPD_INFO_dt[CpdIndex == spectra_info_i$CpdIndex, ]
         file_info_i <- F_INFO_dt[FileIndex == spectra_info_i$FileIndex, ]
@@ -1224,6 +1232,15 @@ run_Spec2Xtract <- function(
               tar_option_set(
                 controller = NULL
               )
+            }
+
+            if (filter_irel > 1) {
+              stop("filter_irel parameter should be between 0 and 1, 0 means all fragments are kept, 1 means only the maximum fragment is kept.")
+            } else if (filter_irel == 1) {
+              warning("filter_irel parameter is set to 1: it means only that only the maximum fragment will be kept.")
+            }
+            if (filter_isopurity > 100) {
+              stop("filter_isopurity is too high, maximum value is 100.")
             }
 
             list(

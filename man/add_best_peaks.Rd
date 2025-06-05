@@ -12,7 +12,7 @@ add_best_peaks(annobject, minscan = 3, rt_limit = NULL, debug = FALSE)
 \item{minscan}{numeric value for the minimum number of scan
 inside a peak to keep it}
 
-\item{rt_limit}{limit rt deviation from reference when searching peaks}
+\item{rt_limit}{limit rt deviation from reference when searching peaks (in seconds)}
 
 \item{debug}{Logical to show log messages (\code{TRUE}) or not (\code{FALSE})}
 }

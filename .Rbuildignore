@@ -10,3 +10,5 @@
 _targets*
 .*.Rout
 report/*
+^.*\.Rproj$
+^\.Rproj\.user$

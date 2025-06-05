@@ -220,7 +220,7 @@ get_spectrum_db <- function(ms_scan_to_get, rawpath) {
   return(
     list(
       "spectra_info_dt" = spectrum_info_vf[],
-      "spectra_db" = ms_spectrum_list
+      "spectra_db" = unique(ms_spectrum_list)
     )
   )
 }

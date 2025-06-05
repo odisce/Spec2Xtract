@@ -410,7 +410,7 @@ fun_best_peaks <- function(pk_scores) {
 
 #' Add peaks detection to annobject
 #'
-#' @param rt_limit limit rt deviation from reference when searching peaks
+#' @param rt_limit limit rt deviation from reference when searching peaks (in seconds)
 #' @inheritParams add_events
 #' @inheritParams add_xics
 #' @inheritParams get_peaks_xic

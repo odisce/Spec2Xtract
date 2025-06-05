@@ -6,3 +6,5 @@ _targets*
 report*
 *Rout
 test-dev*
+.Rproj.user
+result*

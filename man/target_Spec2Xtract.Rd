@@ -35,9 +35,9 @@ columns: compound, rtsec, elemcomposition and optionally inchikey}
 \item{minscan}{numeric value for the minimum number of scan
 inside a peak to keep it}
 
-\item{rt_limit}{limit rt deviation from reference when searching peaks}
+\item{rt_limit}{limit rt deviation from reference when searching peaks (in seconds)}
 
-\item{filter_irel}{Filter ions based on relative intensity}
+\item{filter_irel}{Filter ions based on relative intensity (from 0 to 1)}
 
 \item{filter_isopurity}{Filter ions based on the isolation purity (from 0 to 100)}
 

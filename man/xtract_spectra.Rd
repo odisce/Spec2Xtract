@@ -29,7 +29,7 @@ columns: compound, rtsec, elemcomposition and optionally inchikey}
 
 \item{ms1}{Logical}
 
-\item{rt_limit}{limit rt deviation from reference when searching peaks}
+\item{rt_limit}{limit rt deviation from reference when searching peaks (in seconds)}
 
 \item{ppm}{mass deviation for elemental composition
 search in ppm}
